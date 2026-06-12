@@ -12688,7 +12688,9 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
   <section class="stage-box"><div class="stage-title" id="stageTitle">Choose depth first</div><div class="stage-text" id="stageText">No spell herb slots are open yet.</div><div class="slot-pills" id="slotPills"></div></section>
   <section class="card-list" id="cardList"></section>
   <button class="show-more" id="showMoreBtn">Show More</button>
-  <section class="done-banner" id="doneBanner"><div class="done-title">Extra spell herbs complete</div><div class="done-text">All open extra spell-herb slots are filled. Continue to Crystal.</div></section>
+  <section class="done-banner" id="doneBanner"><div class="done-title">Extra spell herbs complete</div><div class="done-text">All open extra spell-herb slots are filled.</div></section>
+  <style>.continue-btn{-webkit-appearance:none;appearance:none;display:none;width:100%;margin-top:12px;padding:16px;border-radius:10px;background:#e8c040;border:3px solid #c9a000;font-family:Cinzel,serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1a0e04;cursor:pointer;}.continue-btn.show{display:block;}</style>
+  <button class="continue-btn" id="continueBtn">✦ Continue to Crystal ✦</button>
 </div>
 <div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em id="altarSpellName">Your Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
 <div class="info-popup" id="infoPopup"><div class="info-sheet" id="infoSheet"></div></div>
@@ -12744,7 +12746,7 @@ function card(h,i){return \`<article class="item-card \${i===0?'recommended':''}
 function box(l,t,c=''){return \`<div class="square-box \${c}"><div class="box-label">\${l}</div><div class="box-text">\${t}</div></div>\`;}
 function assoc(l,t){return \`<div class="assoc"><span>\${l}</span>\${t}</div>\`;}
 function isComplete(){return state.tier!=='none'&&selected.spellHerbs.length>=tierObj().slots;}
-function renderDone(){let done=isComplete();document.getElementById('doneBanner').classList.toggle('show',done);document.getElementById('forwardBtn').classList.toggle('hidden',!(done||state.cameBack));}
+function renderDone(){let done=isComplete();document.getElementById('doneBanner').classList.toggle('show',done);var cb=document.getElementById('continueBtn');if(cb)cb.classList.toggle('show',done);document.getElementById('forwardBtn').classList.toggle('hidden',!(done||state.cameBack));}
 function chooseTier(t){
   let old=tierObj().slots;
   state.tier=t;
@@ -12768,7 +12770,7 @@ function closeInfo(){document.getElementById('infoPopup').classList.remove('open
 document.addEventListener('DOMContentLoaded',()=>{render();document.getElementById('tracker').addEventListener('click',e=>{e.preventDefault();openAltar();});document.querySelectorAll('.tier-btn').forEach(b=>b.addEventListener('click',()=>chooseTier(b.dataset.tier)));
 document.getElementById('changeDepthBtn').addEventListener('click',()=>{state.chooserExpanded=!state.chooserExpanded;render();});document.getElementById('cardList').addEventListener('click',e=>{const add=e.target.closest('[data-add-index]');const info=e.target.closest('[data-info-index]');if(add){addHerb(parseInt(add.dataset.addIndex,10));return;}if(info){const h=herbList()[parseInt(info.dataset.infoIndex,10)];if(h)openInfo(h,'extra spell herb');}});document.getElementById('showMoreBtn').addEventListener('click',showMore);document.getElementById('closeAltarBtn').addEventListener('click',closeAltar);document.getElementById('altarOverlay').addEventListener('click',e=>{if(e.target.id==='altarOverlay')closeAltar();const sh=e.target.closest('[data-spell-herb-index]');if(sh){e.stopPropagation();let h=selected.spellHerbs[parseInt(sh.dataset.spellHerbIndex,10)];if(h)openInfo(h,'extra spell herb');return;}const slot=e.target.closest('[data-slot]');if(slot){e.stopPropagation();openInfoForSlot(slot.dataset.slot);}});document.getElementById('infoPopup').addEventListener('click',e=>{if(e.target.id==='infoPopup'||e.target.id==='closeInfoBtn')closeInfo();});document.getElementById('backBtn').addEventListener('click',()=>{state.cameBack=true;render();});document.getElementById('forwardBtn').addEventListener('click',()=>{
   send('extraHerbsComplete',{spellHerbs:selected.spellHerbs,tier:state.tier});
-});});
+});var cb=document.getElementById('continueBtn');if(cb)cb.addEventListener('click',()=>{send('extraHerbsComplete',{spellHerbs:selected.spellHerbs,tier:state.tier});});});
 <\/script>
 
 <script id="gm-new-shell-bridge">
