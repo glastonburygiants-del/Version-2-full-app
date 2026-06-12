@@ -13864,12 +13864,16 @@ function renderCards(){
     const usesSection = uses.length
       ? \`<div class="card-uses"><div class="card-uses-label">Matched for this spell</div>\${pillsHTML}</div>\`
       : '';
+    // Deity items have o='Deity' (category label, not a folk name) — show real name instead
+    const folkName = (item.o && item.o !== item.c) ? item.o : null;
+    const primaryName = folkName || item.n;
+    const secondaryName = folkName ? item.n : (item.l && item.l !== item.c ? item.l : '');
     return \`<article class="item-card \${i===0?'rank-1':''}">
       <div class="card-head" onclick="openInfo(\${i})">
         \${i===0?'<div class="card-rank">✦ Top Recommendation</div>':''}
-        <div class="card-name">\${esc(item.o||item.n)}</div>
-        \${item.o&&item.n!==item.o?\`<div class="card-old">\${esc(item.n)}</div>\`:''}
-        \${item.l?\`<div class="card-latin">\${esc(item.l)}</div>\`:''}
+        <div class="card-name">\${esc(primaryName)}</div>
+        \${secondaryName?\`<div class="card-old">\${esc(secondaryName)}</div>\`:''}
+        \${item.l&&folkName?\`<div class="card-latin">\${esc(item.l)}</div>\`:''}
       </div>
       \${usesSection}
       <div class="card-actions">
@@ -14170,6 +14174,7 @@ window.addEventListener('message', function(ev){
     if(step === 'oil'){
       // All done — go to print pack
       appState.currentStep = 'summary';
+      saveStateForPrintPack(appState);
       showPage('printPack');
     } else if(stepIdx >= 0 && stepIdx < STEP_ORDER.length - 1){
       const nextStep = STEP_ORDER[stepIdx + 1];
@@ -14188,10 +14193,80 @@ window.addEventListener('message', function(ev){
     if(m.selectionState && m.selectionState.selected){
       Object.assign(appState.selections, m.selectionState.selected);
     }
-    if(m.cmd === 'selectionComplete') showPage('printPack');
+    if(m.cmd === 'selectionComplete'){
+      saveStateForPrintPack(appState);
+      showPage('printPack');
+    }
     return;
   }
 });
+
+// ── Convert appState to the format expected by printPack's loadSummaryData() ──
+function saveStateForPrintPack(state){
+  try{
+    var a = function(v){ return Array.isArray(v)?v:(v?[v]:[]); };
+    function gmToItem(i, label){
+      if(!i) return null;
+      return {
+        itemLabel: label || i.n || '',
+        name: i.n || '',
+        old: i.o || i.n || '',
+        element: a(i.el)[0] || '',
+        planet: a(i.pl)[0] || '',
+        day: a(i.dy)[0] || '',
+        energy: a(i.en)[0] || '',
+        sabbat: a(i.sb || i.sab)[0] || '',
+        magical: i.mu || '',
+        green: i.ge || '',
+        powers: i.pw || ''
+      };
+    }
+    var c = state.candle || {};
+    var sel = state.selections || {};
+    var candleItem = {
+      itemLabel: (c.colour||'') + ' Candle',
+      name: (c.colour||'') + ' Candle',
+      old: (c.colour||'') + ' Candle',
+      element: c.element || '',
+      planet: '', day: '', energy: '', sabbat: '',
+      magical: (c.colour||'') + ' candle chosen for this spell.',
+      green: 'The candle carries the first flame of intention.',
+      powers: 'Flame, focus and spell direction.'
+    };
+    var summary = {
+      spell: {
+        name: state.spell || 'A Spell',
+        category: state.category || '',
+        depth: 'A Weaving',
+        moonPhase: '',
+        focusNumber: '',
+        focusPlanet: '',
+        numerologyQuote: '',
+        recommendedMethod: state.method || 'jar'
+      },
+      timing: [],
+      items: {
+        candle: candleItem,
+        earth:   gmToItem(sel.earth,   'Earth Herb'),
+        air:     gmToItem(sel.air,     'Air Herb'),
+        fire:    gmToItem(sel.fire,    'Fire Herb'),
+        water:   gmToItem(sel.water,   'Water Herb'),
+        crystal: gmToItem(sel.crystal, 'Crystal'),
+        rune:    gmToItem(sel.rune,    'Rune'),
+        oil:     gmToItem(sel.oil,     'Oil'),
+        goddess: gmToItem(sel.goddess, 'Goddess'),
+        god:     gmToItem(sel.god,     'God'),
+        spellHerbs: [],
+        goddessHerb: null,
+        godHerb: null
+      }
+    };
+    localStorage.setItem('greenman_spell_summary_state', JSON.stringify(summary));
+    localStorage.setItem('greenman_current_spell_full', JSON.stringify(summary));
+    localStorage.setItem('gm_current_spell', JSON.stringify(summary));
+    if(state.method) localStorage.setItem('greenman_selected_spell_method', state.method);
+  }catch(e){}
+}
 
 // ── Boot ──
 buildTabs();
