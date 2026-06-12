@@ -12630,7 +12630,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 </style>
 </head>
 <body>
-<div class="tracker" id="tracker"><div class="tracker-spell">&#10022; TAP TRACKER TO OPEN ALTAR &middot; A LOVE SPELL &#10022;</div><div class="tracker-grid" id="trackerGrid"></div></div>
+<div class="tracker" id="tracker"><div class="tracker-spell">&#10022; TAP TRACKER TO OPEN ALTAR &#10022;</div><div class="tracker-grid" id="trackerGrid"></div></div>
 <div class="page-scroll" id="pageScroll">
   <div class="title-row"><button class="nav-btn" id="backBtn">&#8592; Back</button><div class="page-title">&#10022; Choose Your Spell Herbs &#10022;</div><button class="nav-btn hidden" id="forwardBtn">Forward &#8594;</button></div>
   <section class="guidance" id="guidanceBox">
@@ -12651,12 +12651,13 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
   <button class="show-more" id="showMoreBtn">Show More</button>
   <section class="done-banner" id="doneBanner"><div class="done-title">Extra spell herbs complete</div><div class="done-text">All open extra spell-herb slots are filled. Continue to Crystal.</div></section>
 </div>
-<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em>A Love Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
+<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em id="altarSpellName">Your Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
 <div class="info-popup" id="infoPopup"><div class="info-sheet" id="infoSheet"></div></div>
 <nav class="tabbar"><div class="tab active"><span class="tab-icon">&#10022;</span><span class="tab-label">Spells</span></div><div class="tab"><span class="tab-icon">&#128214;</span><span class="tab-label">Grimoire</span></div><div class="tab"><span class="tab-icon">&#127769;</span><span class="tab-label">Moon</span></div><div class="tab"><span class="tab-icon">&#128290;</span><span class="tab-label">Number</span></div><div class="tab"><span class="tab-icon">&#128220;</span><span class="tab-label">Journal</span></div></nav>
 <script>
 const tiers={none:{slots:0,total:6,initial:0,max:0,label:'Choose a depth'},handful:{slots:1,total:7,initial:5,max:9,label:'A Handful'},weaving:{slots:3,total:9,initial:9,max:14,label:'A Weaving'},grove:{slots:7,total:13,initial:14,max:21,label:'The Full Grove'}};
-const selected={candle:{old:'Pink Candle',name:'Pink',latin:'Candle Colour',magical:'Emotional love, nurturing relationships, romance and friendship.',powers:'Opens the heart and softens the spell.',folk:'Fixed sample candle.',green:'',element:'Water',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},earth:{old:'Little Faces',name:'Viola',latin:'Viola tricolor',magical:'love, affection, friendship',powers:'softening the heart',folk:'Named for the little faces in the flower.',green:'It opens small woodland doors of tenderness.',element:'Earth',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},air:{old:'Mother of Thyme',name:'Thyme',latin:'Thymus vulgaris',magical:'courage, love, cleansing',powers:'bravery and breath',folk:'Herb of bees and courage.',green:'It hums through the canopy.',element:'Air',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},fire:{old:'Dew of the Sea',name:'Rosemary',latin:'Salvia rosmarinus',magical:'love, protection, memory',powers:'strength and remembrance',folk:'Old herb of remembrance.',green:'It sparks green memory into flame.',element:'Fire',planet:'Sun',energy:'Masculine',day:'Sunday',sabbat:'Litha'},water:{old:'Rose Petals',name:'Rose',latin:'Rosa spp.',magical:'love, romance, healing',powers:'heart opening',folk:'Flower of love and devotion.',green:'It lets the green heart bloom.',element:'Water',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},goddess:null,god:null,crystal:null,rune:null,oil:null,spellHerbs:[]};
+var _S=window.__GM_STATE__||{};var _IT=window.__GM_ITEMS__||[];function _a(v){return Array.isArray(v)?v:(v?[v]:[]);}function _gmt(i){if(!i)return null;if(i.colour)return{old:i.colour+' Candle',name:i.colour+' Candle',latin:'Candle Colour',magical:i.colour+' candle.',powers:'',folk:'',green:'',element:i.element||'',planet:'',energy:'',day:'',sabbat:''};return{old:(i.o&&i.o!==i.c)?i.o:i.n||'',name:i.n||'',latin:i.l||'',magical:i.mu||'',powers:i.pw||'',folk:i.fl||'',green:i.ge||'',element:_a(i.el)[0]||'',planet:_a(i.pl)[0]||'',energy:_a(i.en)[0]||'',day:_a(i.dy)[0]||'',sabbat:_a(i.sb||i.sab)[0]||''};}
+var _sel=(_S.selections||{});const selected={candle:_gmt(_S.candle),earth:_gmt(_sel.earth),air:_gmt(_sel.air),fire:_gmt(_sel.fire),water:_gmt(_sel.water),crystal:_gmt(_sel.crystal),rune:_gmt(_sel.rune),goddess:_sel.goddess?_gmt(_sel.goddess):null,god:_sel.god?_gmt(_sel.god):null,oil:_sel.oil?_gmt(_sel.oil):null,spellHerbs:(_sel.spellHerbs||[]).map(_gmt)};
 const herbRows=[
  ['Apple Heart','Apple','Malus domestica','love, blessing, fertility','heart magic','Fruit of love and hidden stars','It keeps sweetness in the green world.','Earth','Venus','Feminine','Friday','Samhain'],
  ['Hare\\u2019s Foot','Clover','Trifolium repens','luck, love, protection','light blessing','Lucky field charm','It moves softly through meadow wind.','Air','Mercury','Feminine','Wednesday','Beltane'],
@@ -13137,7 +13138,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 </style>
 </head>
 <body>
-<div class="tracker" id="tracker"><div class="tracker-spell">&#10022; TAP TRACKER TO OPEN ALTAR &middot; A LOVE SPELL &#10022;</div><div class="tracker-grid" id="trackerGrid"></div></div>
+<div class="tracker" id="tracker"><div class="tracker-spell">&#10022; TAP TRACKER TO OPEN ALTAR &#10022;</div><div class="tracker-grid" id="trackerGrid"></div></div>
 <div class="page-scroll" id="pageScroll">
   <div class="title-row"><button class="nav-btn" id="backBtn">&#8592; Back</button><div class="page-title">&#10022; Choose Your Deities &#10022;</div><button class="nav-btn hidden" id="forwardBtn">Forward &#8594;</button></div>
   <section class="guidance">
@@ -13153,30 +13154,14 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
   <button class="show-more" id="showMoreBtn">Show More &middot; 7 More</button>
   <section class="done-banner" id="doneBanner"><div class="done-title">Deities and deity herbs complete</div><div class="done-text">The Goddess/God witness and their two herbs are chosen. Continue to Oil.</div></section>
 </div>
-<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em>A Love Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
+<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em id="altarSpellName">Your Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
 <div class="info-popup" id="infoPopup"><div class="info-sheet" id="infoSheet"></div></div>
 <nav class="tabbar"><div class="tab active"><span class="tab-icon">&#10022;</span><span class="tab-label">Spells</span></div><div class="tab"><span class="tab-icon">&#128214;</span><span class="tab-label">Grimoire</span></div><div class="tab"><span class="tab-icon">&#127769;</span><span class="tab-label">Moon</span></div><div class="tab"><span class="tab-icon">&#128290;</span><span class="tab-label">Number</span></div><div class="tab"><span class="tab-icon">&#128220;</span><span class="tab-label">Journal</span></div></nav>
 <script>
-const selected={candle:{old:'Pink Candle',name:'Pink',latin:'Candle Colour',magical:'Emotional love, nurturing relationships, romance and friendship.',powers:'Opens the heart and softens the spell.',folk:'Fixed sample candle.',green:'',element:'Water',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},earth:{old:'Little Faces',name:'Viola',latin:'Viola tricolor',magical:'love, affection, friendship',powers:'softening the heart',folk:'Named for the little faces in the flower.',green:'It opens small woodland doors of tenderness.',element:'Earth',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},air:{old:'Mother of Thyme',name:'Thyme',latin:'Thymus vulgaris',magical:'courage, love, cleansing',powers:'bravery and breath',folk:'Herb of bees and courage.',green:'It hums through the canopy.',element:'Air',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},fire:{old:'Dew of the Sea',name:'Rosemary',latin:'Salvia rosmarinus',magical:'love, protection, memory',powers:'strength and remembrance',folk:'Old herb of remembrance.',green:'It sparks green memory into flame.',element:'Fire',planet:'Sun',energy:'Masculine',day:'Sunday',sabbat:'Litha'},water:{old:'Rose Petals',name:'Rose',latin:'Rosa spp.',magical:'love, romance, healing',powers:'heart opening',folk:'Flower of love and devotion.',green:'It lets the green heart bloom.',element:'Water',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},crystal:{old:'Heart Stone',name:'Rose Quartz',latin:'Quartz',magical:'love, healing, friendship',powers:'heart healing',folk:'Stone of love and tenderness.',green:'It softens the spell with old stone kindness.',element:'Water',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Beltane'},rune:{old:'Gyfu',name:'Gebo',latin:'\\u16b7 \\u00b7 gift',magical:'gift, love, exchange',powers:'balanced giving',folk:'Rune of gift and exchange.',green:'It trades breath between root and crown.',element:'Air',planet:'Venus',energy:'Dual',day:'Friday',sabbat:'Beltane'},oil:null,spellHerbs:[{old:'Apple Heart',name:'Apple',latin:'Malus domestica',magical:'love, blessing, fertility',powers:'heart magic',folk:'Fruit of love and hidden stars.',green:'It keeps sweetness in the green world.',element:'Earth',planet:'Venus',energy:'Feminine',day:'Friday',sabbat:'Samhain'}],goddess:null,god:null,goddessHerb:null,godHerb:null};
-const deities=[
- {old:'Lady of Love',name:'Aphrodite',latin:'Goddess of Love and Beauty',polarity:'Goddess',magical:'love, attraction, romance',powers:'Venus blessing and love magic',folk:'Called here as a sample Goddess presence.',green:'Her presence softens the spell into green devotion.',element:'Water',planet:'Venus',energy:'Goddess',day:'Friday',sabbat:'Beltane'},
- {old:'Bright Bringer',name:'Brigid',latin:'Goddess of Flame, Healing and Poetry',polarity:'Goddess',magical:'healing, inspiration, protection',powers:'sacred flame and poetry',folk:'A bright healing goddess.',green:'She brings flame to the green shrine.',element:'Fire',planet:'Sun',energy:'Goddess',day:'Sunday',sabbat:'Imbolc'},
- {old:'Forest Mother',name:'Danu',latin:'Mother Goddess of the Green World',polarity:'Goddess',magical:'blessing, fertility, protection',powers:'mother river and green root',folk:'An old mother current in the land.',green:'She fills the spell with deep green memory.',element:'Earth',planet:'Moon',energy:'Goddess',day:'Monday',sabbat:'Beltane'},
- {old:'Oak Father',name:'Cernunnos',latin:'God of Wildwood and Horned Things',polarity:'God',magical:'wild blessing, protection, fertility',powers:'Horned guardian of green places',folk:'Called here as a sample God presence.',green:'His presence roots the spell in the Wildwood.',element:'Earth',planet:'Jupiter',energy:'God',day:'Thursday',sabbat:'Beltane'},
- {old:'Bright Archer',name:'Apollo',latin:'God of Sun, Music and Healing',polarity:'God',magical:'healing, sun, success',powers:'solar harmony and healing',folk:'A bright solar god.',green:'He threads sunlight through leaf and song.',element:'Fire',planet:'Sun',energy:'God',day:'Sunday',sabbat:'Litha'},
- {old:'Thunder Lord',name:'Thor',latin:'God of Protection and Strength',polarity:'God',magical:'protection, courage, strength',powers:'thunder guard',folk:'A strong guardian god.',green:'He gives the spell its old oak bones.',element:'Fire',planet:'Mars',energy:'God',day:'Tuesday',sabbat:'Yule'},
- {old:'The Old Green One',name:'Greenman',latin:'Dual Spirit of Root and Crown',polarity:'Dual',magical:'green blessing, growth, protection',powers:'root and crown together',folk:'The green face in leaf and stone.',green:'They stand as both witness and wildwood.',element:'Earth',planet:'Sun',energy:'Dual',day:'Sunday',sabbat:'Beltane'}
-];
-const herbs=[
- {old:'Venus Crown',name:'Vervain',latin:'Verbena officinalis',pool:'goddess',deity:'Aphrodite',magical:'love, blessing, sacred union',powers:'Venus herb, Goddess witness',folk:'Old sacred herb of love and oath.',green:'It carries the Lady\\u2019s green blessing.',element:'Water',planet:'Venus',energy:'Goddess',day:'Friday',sabbat:'Beltane'},
- {old:'Heart Cup',name:'Rosemary Flower',latin:'Salvia rosmarinus',pool:'goddess',deity:'Aphrodite',magical:'love, remembrance, devotion',powers:'Goddess memory and blessing',folk:'A flower of remembrance.',green:'It keeps the Goddess name warm in the work.',element:'Fire',planet:'Sun',energy:'Goddess',day:'Sunday',sabbat:'Litha'},
- {old:'Silver Mantle',name:'Lady\\u2019s Mantle',latin:'Alchemilla vulgaris',pool:'goddess',deity:'Danu',magical:'love, healing, feminine power',powers:'dew blessing, Goddess herb',folk:'Alchemist dew plant.',green:'It gathers morning pearls for her presence.',element:'Water',planet:'Venus',energy:'Goddess',day:'Friday',sabbat:'Beltane'},
- {old:'Wild Crown',name:'Oak Leaf',latin:'Quercus robur',pool:'god',deity:'Cernunnos',magical:'strength, protection, loyalty',powers:'God herb, oak power',folk:'Leaf of the old king tree.',green:'It carries the Lord\\u2019s crown and root.',element:'Earth',planet:'Sun',energy:'God',day:'Sunday',sabbat:'Litha'},
- {old:'Horn Root',name:'Burdock',latin:'Arctium lappa',pool:'god',deity:'Cernunnos',magical:'grounding, protection, strength',powers:'God herb, deep roots',folk:'A root that holds fast.',green:'It gives the Horned One firm soil.',element:'Earth',planet:'Jupiter',energy:'God',day:'Thursday',sabbat:'Beltane'},
- {old:'Green Fire',name:'Nettle',latin:'Urtica dioica',pool:'god',deity:'Thor',magical:'protection, courage, healing',powers:'God herb, wild force',folk:'Plant of sting and iron.',green:'It gives the Wildwood its teeth.',element:'Fire',planet:'Mars',energy:'God',day:'Tuesday',sabbat:'Beltane'},
- {old:'Dual Grove',name:'Mugwort',latin:'Artemisia vulgaris',pool:'dual',deity:'Greenman',magical:'dreams, protection, divination',powers:'dual threshold herb',folk:'Old dream and moon herb.',green:'It stands between Goddess and God.',element:'Air',planet:'Moon',energy:'Dual',day:'Monday',sabbat:'Samhain'},
- {old:'Two Crowns',name:'Meadowsweet',latin:'Filipendula ulmaria',pool:'dual',deity:'Greenman',magical:'love, peace, blessing',powers:'dual blessing herb',folk:'Strewing herb of old homes.',green:'It sweetens both sides of the altar.',element:'Air',planet:'Venus',energy:'Dual',day:'Friday',sabbat:'Lammas'}
-];
+var _S=window.__GM_STATE__||{};var _IT=window.__GM_ITEMS__||[];function _a(v){return Array.isArray(v)?v:(v?[v]:[]);}function _gmt(i){if(!i)return null;if(i.colour)return{old:i.colour+' Candle',name:i.colour+' Candle',latin:'Candle Colour',magical:i.colour+' candle.',powers:'',folk:'',green:'',element:i.element||'',planet:'',energy:'',day:'',sabbat:''};return{old:(i.o&&i.o!==i.c)?i.o:i.n||'',name:i.n||'',latin:i.l||'',magical:i.mu||'',powers:i.pw||'',folk:i.fl||'',green:i.ge||'',element:_a(i.el)[0]||'',planet:_a(i.pl)[0]||'',energy:_a(i.en)[0]||'',day:_a(i.dy)[0]||'',sabbat:_a(i.sb||i.sab)[0]||''};}
+var _dsel=(_S.selections||{});const selected={candle:_gmt(_S.candle),earth:_gmt(_dsel.earth),air:_gmt(_dsel.air),fire:_gmt(_dsel.fire),water:_gmt(_dsel.water),crystal:_gmt(_dsel.crystal),rune:_gmt(_dsel.rune),goddess:_dsel.goddess?_gmt(_dsel.goddess):null,god:_dsel.god?_gmt(_dsel.god):null,oil:_dsel.oil?_gmt(_dsel.oil):null,spellHerbs:(_dsel.spellHerbs||[]).map(_gmt),goddessHerb:null,godHerb:null};
+const deities=_IT.filter(function(i){return i.c==='Deity'&&!/^ALL/.test(i.n);}).map(function(i){var en=_a(i.en)[0]||'';var pol=/masculine/i.test(en)?'God':/feminine/i.test(en)?'Goddess':'Dual';return{old:(i.o&&i.o!==i.c)?i.o:'',name:i.n||'',latin:i.l||'',polarity:pol,magical:i.mu||'',powers:i.pw||'',folk:i.fl||'',green:i.ge||'',element:_a(i.el)[0]||'',planet:_a(i.pl)[0]||'',energy:_a(i.en)[0]||'',day:_a(i.dy)[0]||'',sabbat:_a(i.sb||i.sab)[0]||''};});
+const herbs=_IT.filter(function(i){return i.c==='Herb';}).map(function(i){var en=_a(i.en)[0]||'';var pool=/masculine/i.test(en)?'god':/feminine/i.test(en)?'goddess':'dual';return{old:(i.o&&i.o!==i.c)?i.o:i.n||'',name:i.n||'',latin:i.l||'',pool:pool,deity:'',magical:i.mu||'',powers:i.pw||'',folk:i.fl||'',green:i.ge||'',element:_a(i.el)[0]||'',planet:_a(i.pl)[0]||'',energy:_a(i.en)[0]||'',day:_a(i.dy)[0]||'',sabbat:_a(i.sb||i.sab)[0]||''};});
 let state={stage:'goddess',filter:'goddess',shown:7,cameBack:false,dualMode:false};
 const stageOrder=['goddess','goddessHerb','god','godHerb'];
 function isComplete(){return !!(selected.goddess&&selected.god&&selected.goddessHerb&&selected.godHerb);}
@@ -13867,7 +13852,10 @@ function renderCards(){
     // Deity items have o='Deity' (category label, not a folk name) — show real name instead
     const folkName = (item.o && item.o !== item.c) ? item.o : null;
     const primaryName = folkName || item.n;
-    const secondaryName = folkName ? item.n : (item.l && item.l !== item.c ? item.l : '');
+    // For deities: secondary is the folk name (if exists). For herbs/crystals/runes: secondary is item.n.
+    // For deity items with no folk name: show their polarity from en field (Goddess/God/Dual).
+    const deityPolarity = !folkName && item.c === 'Deity' ? arrify(item.en).join(', ') : '';
+    const secondaryName = folkName ? item.n : deityPolarity || '';
     return \`<article class="item-card \${i===0?'rank-1':''}">
       <div class="card-head" onclick="openInfo(\${i})">
         \${i===0?'<div class="card-rank">✦ Top Recommendation</div>':''}
@@ -13913,11 +13901,16 @@ function openInfo(idx){
   const mu = item._mu && item._mu.length ? item._mu : null;
   const allMu = String(item.mu||'');
 
+  // Deity items have o='Deity' — show real name as headline, polarity as subtitle
+  const infoFolk = (item.o && item.o !== item.c) ? item.o : null;
+  const infoMain = infoFolk || item.n;
+  const infoSub  = infoFolk ? item.n : '';
+  const infoPolarity = !infoFolk && item.l ? item.l : '';
   let html = \`<div class="info-name-block">
-    <div class="info-type">\${esc(item.c)}</div>
-    <div class="info-old">\${esc(item.o||item.n)}</div>
-    \${item.o&&item.n!==item.o?\`<div class="info-name">\${esc(item.n)}</div>\`:''}
-    \${item.l?\`<div class="info-latin">\${esc(item.l)}</div>\`:''}
+    <div class="info-type">\${esc(item.c)}\${infoPolarity?' · '+esc(infoPolarity):''}</div>
+    <div class="info-old">\${esc(infoMain)}</div>
+    \${infoSub?\`<div class="info-name">\${esc(infoSub)}</div>\`:''}
+    \${infoFolk&&item.l?\`<div class="info-latin">\${esc(item.l)}</div>\`:''}
   </div>
   <div class="info-grid">\`;
 
