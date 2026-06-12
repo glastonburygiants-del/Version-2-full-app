@@ -135,9 +135,9 @@ function blankState(){
     version:1, currentStep:'category',
     category:null, spell:null, spellKeywords:[],
     candle:null,
-    selections:{earth:null,air:null,fire:null,water:null,crystal:null,rune:null,goddess:null,god:null,oil:null},
+    selections:{earth:null,air:null,fire:null,water:null,crystal:null,rune:null,goddess:null,god:null,oil:null,spellHerbs:[]},
     matchedUses:{earth:[],air:[],fire:[],water:[],crystal:[],rune:[],goddess:[],god:[],oil:[]},
-    associationReasons:{}, method:null, summary:null
+    associationReasons:{}, method:null, spellTier:'none', summary:null
   };
 }
 
@@ -12766,7 +12766,9 @@ function ibox(l,t,c=''){return \`<div class="info-square \${c}"><div class="info
 function aword(l,t){return \`<div class="aword"><b>\${l}</b>\${t||''}</div>\`;}
 function closeInfo(){document.getElementById('infoPopup').classList.remove('open');}
 document.addEventListener('DOMContentLoaded',()=>{render();document.getElementById('tracker').addEventListener('click',e=>{e.preventDefault();openAltar();});document.querySelectorAll('.tier-btn').forEach(b=>b.addEventListener('click',()=>chooseTier(b.dataset.tier)));
-document.getElementById('changeDepthBtn').addEventListener('click',()=>{state.chooserExpanded=!state.chooserExpanded;render();});document.getElementById('cardList').addEventListener('click',e=>{const add=e.target.closest('[data-add-index]');const info=e.target.closest('[data-info-index]');if(add){addHerb(parseInt(add.dataset.addIndex,10));return;}if(info){const h=herbList()[parseInt(info.dataset.infoIndex,10)];if(h)openInfo(h,'extra spell herb');}});document.getElementById('showMoreBtn').addEventListener('click',showMore);document.getElementById('closeAltarBtn').addEventListener('click',closeAltar);document.getElementById('altarOverlay').addEventListener('click',e=>{if(e.target.id==='altarOverlay')closeAltar();const sh=e.target.closest('[data-spell-herb-index]');if(sh){e.stopPropagation();let h=selected.spellHerbs[parseInt(sh.dataset.spellHerbIndex,10)];if(h)openInfo(h,'extra spell herb');return;}const slot=e.target.closest('[data-slot]');if(slot){e.stopPropagation();openInfoForSlot(slot.dataset.slot);}});document.getElementById('infoPopup').addEventListener('click',e=>{if(e.target.id==='infoPopup'||e.target.id==='closeInfoBtn')closeInfo();});document.getElementById('backBtn').addEventListener('click',()=>{state.cameBack=true;render();});document.getElementById('forwardBtn').addEventListener('click',()=>alert('Next page: Crystal'));});
+document.getElementById('changeDepthBtn').addEventListener('click',()=>{state.chooserExpanded=!state.chooserExpanded;render();});document.getElementById('cardList').addEventListener('click',e=>{const add=e.target.closest('[data-add-index]');const info=e.target.closest('[data-info-index]');if(add){addHerb(parseInt(add.dataset.addIndex,10));return;}if(info){const h=herbList()[parseInt(info.dataset.infoIndex,10)];if(h)openInfo(h,'extra spell herb');}});document.getElementById('showMoreBtn').addEventListener('click',showMore);document.getElementById('closeAltarBtn').addEventListener('click',closeAltar);document.getElementById('altarOverlay').addEventListener('click',e=>{if(e.target.id==='altarOverlay')closeAltar();const sh=e.target.closest('[data-spell-herb-index]');if(sh){e.stopPropagation();let h=selected.spellHerbs[parseInt(sh.dataset.spellHerbIndex,10)];if(h)openInfo(h,'extra spell herb');return;}const slot=e.target.closest('[data-slot]');if(slot){e.stopPropagation();openInfoForSlot(slot.dataset.slot);}});document.getElementById('infoPopup').addEventListener('click',e=>{if(e.target.id==='infoPopup'||e.target.id==='closeInfoBtn')closeInfo();});document.getElementById('backBtn').addEventListener('click',()=>{state.cameBack=true;render();});document.getElementById('forwardBtn').addEventListener('click',()=>{
+  send('extraHerbsComplete',{spellHerbs:selected.spellHerbs,tier:state.tier});
+});});
 <\/script>
 
 <script id="gm-new-shell-bridge">
@@ -14091,9 +14093,9 @@ function blankState(){
     version:1, currentStep:'category',
     category:null, spell:null, spellKeywords:[],
     candle:null,
-    selections:{earth:null,air:null,fire:null,water:null,crystal:null,rune:null,goddess:null,god:null,oil:null},
+    selections:{earth:null,air:null,fire:null,water:null,crystal:null,rune:null,goddess:null,god:null,oil:null,spellHerbs:[]},
     matchedUses:{earth:[],air:[],fire:[],water:[],crystal:[],rune:[],goddess:[],god:[],oil:[]},
-    associationReasons:{}, method:null, summary:null
+    associationReasons:{}, method:null, spellTier:'none', summary:null
   };
 }
 
@@ -14210,6 +14212,10 @@ window.addEventListener('message', function(ev){
       appState.currentStep = 'summary';
       saveStateForPrintPack(appState);
       showPage('printPack');
+    } else if(step === 'water'){
+      // After water → go to extra herbs (tier/depth chooser) before crystal
+      appState.currentStep = 'extraHerbs';
+      showPage('extraHerbs');
     } else if(stepIdx >= 0 && stepIdx < STEP_ORDER.length - 1){
       const nextStep = STEP_ORDER[stepIdx + 1];
       appState.currentStep = nextStep;
@@ -14219,6 +14225,15 @@ window.addEventListener('message', function(ev){
         f3.contentWindow.postMessage({cmd:'setStep', step:nextStep, state: JSON.parse(JSON.stringify(appState))}, '*');
       }catch(e){}
     }
+    return;
+  }
+
+  // Extra herbs complete → store spell herbs, advance to crystal
+  if(m.cmd === 'extraHerbsComplete'){
+    if(m.spellHerbs) appState.selections.spellHerbs = m.spellHerbs;
+    if(m.tier) appState.spellTier = m.tier;
+    appState.currentStep = 'crystal';
+    showPage('selection');
     return;
   }
 
@@ -14290,7 +14305,8 @@ function buildSummaryForPack(state){
       oil:     gmToItem(sel.oil,     'Oil'),
       goddess: gmToItem(sel.goddess, 'Goddess'),
       god:     gmToItem(sel.god,     'God'),
-      spellHerbs: [], goddessHerb: null, godHerb: null
+      spellHerbs: (sel.spellHerbs||[]).map(function(h){ return gmToItem(h,'Spell Herb'); }).filter(Boolean),
+      goddessHerb: null, godHerb: null
     }
   };
 }
@@ -14348,7 +14364,7 @@ function saveStateForPrintPack(state){
         oil:     gmToItem(sel.oil,     'Oil'),
         goddess: gmToItem(sel.goddess, 'Goddess'),
         god:     gmToItem(sel.god,     'God'),
-        spellHerbs: [],
+        spellHerbs: (sel.spellHerbs||[]).map(function(h){ return h ? gmToItem(h,'Spell Herb') : null; }).filter(Boolean),
         goddessHerb: null,
         godHerb: null
       }
