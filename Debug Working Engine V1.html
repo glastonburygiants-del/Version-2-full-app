@@ -10207,9 +10207,9 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 </header>
   <main class="altar-sheet">
     <div class="altar-top-row">
-      <div class="altar-slot filled"><div class="altar-label">\\u2600 God</div><div class="altar-val">Eros</div><div class="deity-herb-line">Herb: Horn Root</div></div>
-      <div class="altar-slot filled"><div class="altar-label">\\ud83d\\udd6f Candle</div><div class="altar-val">Pink Candle</div></div>
-      <div class="altar-slot filled"><div class="altar-label">\\u263d Goddess</div><div class="altar-val">Aphrodite</div><div class="deity-herb-line">Herb: Venus Crown</div></div>
+      <div class="altar-slot filled"><div class="altar-label">☀ God</div><div class="altar-val">Eros</div><div class="deity-herb-line">Herb: Horn Root</div></div>
+      <div class="altar-slot filled"><div class="altar-label">🕯 Candle</div><div class="altar-val">Pink Candle</div></div>
+      <div class="altar-slot filled"><div class="altar-label">☽ Goddess</div><div class="altar-val">Aphrodite</div><div class="deity-herb-line">Herb: Venus Crown</div></div>
     </div>
     <div class="element-circle">
       <svg viewBox="0 0 330 330" xmlns="http://www.w3.org/2000/svg">
@@ -10217,19 +10217,19 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
         <circle cx="165" cy="165" r="123" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="1.5"/>
         <path d="M165,43 L196,134 L292,134 L214,188 L244,286 L165,227 L86,286 L116,188 L38,134 L134,134 Z" fill="none" stroke="rgba(201,168,76,0.30)" stroke-width="2"/>
       </svg>
-      <div class="altar-slot earth filled"><div class="altar-label">\\ud83c\\udf0d Earth</div><div class="altar-val">Little Faces</div></div>
-      <div class="altar-slot air filled"><div class="altar-label">\\ud83d\\udca8 Air</div><div class="altar-val">Mother of Thyme</div></div>
-      <div class="altar-slot fire filled"><div class="altar-label">\\ud83d\\udd25 Fire</div><div class="altar-val">Dew of the Sea</div></div>
-      <div class="altar-slot water filled"><div class="altar-label">\\ud83d\\udca7 Water</div><div class="altar-val">Flower of Venus</div></div>
-      <div class="altar-slot centre filled"><div class="altar-label">\\ud83c\\udf3f Extra Spell Herbs</div>
+      <div class="altar-slot earth filled"><div class="altar-label">🌍 Earth</div><div class="altar-val">Little Faces</div></div>
+      <div class="altar-slot air filled"><div class="altar-label">💨 Air</div><div class="altar-val">Mother of Thyme</div></div>
+      <div class="altar-slot fire filled"><div class="altar-label">🔥 Fire</div><div class="altar-val">Dew of the Sea</div></div>
+      <div class="altar-slot water filled"><div class="altar-label">💧 Water</div><div class="altar-val">Flower of Venus</div></div>
+      <div class="altar-slot centre filled"><div class="altar-label">🌿 Crystal</div>
         <div class="mini-herb">1. Sea-foam Blossom</div>
         <div class="mini-herb">2. Elf Leaf</div>
         <div class="mini-herb">3. Moonflower</div>
       </div>
     </div>
     <div class="altar-bottom-row">
-      <div class="altar-slot filled"><div class="altar-label">\\u25c7 Crystal</div><div class="altar-val">Flower Quartz</div></div>
-      <div class="altar-slot filled"><div class="altar-label">\\u16b7 Rune</div><div class="altar-val">Gift Rune</div></div>
+      <div class="altar-slot filled"><div class="altar-label">◇ Crystal</div><div class="altar-val">Flower Quartz</div></div>
+      <div class="altar-slot filled"><div class="altar-label">ᚷ Rune</div><div class="altar-val">Gift Rune</div></div>
       <div class="altar-slot filled"><div class="altar-label">Oil</div><div class="altar-val">Rose Heart</div></div>
     </div>
   </main>
@@ -10721,6 +10721,9 @@ function escText(v){
 
 function loadSummaryData(){
   try{
+    if(window.__GM_SUMMARY__ && window.__GM_SUMMARY__.spell && window.__GM_SUMMARY__.items) return window.__GM_SUMMARY__;
+  }catch(e){}
+  try{
     var raw = localStorage.getItem('greenman_spell_summary_state') || localStorage.getItem('greenman_current_spell_full');
     if(raw){
       var parsed = JSON.parse(raw);
@@ -10782,8 +10785,44 @@ function renderSummary(){
   fillCorrespondence(getItems());
   fillNumerologyQuote(s);
   fillAltar(i);
+  fillAltarPage(i);
+  fillPageTitles(s);
   fillItemList(getMainLowerItems());
   setRecommended(methodRecommendation());
+}
+
+function fillAltarPage(i){
+  function ov(it){ return it ? (it.old || it.name || it.itemLabel || '') : ''; }
+  var topRow = document.querySelector('.altar-top-row');
+  if(topRow){
+    var slots = topRow.querySelectorAll('.altar-slot');
+    if(slots[0]){ var v=slots[0].querySelector('.altar-val'); if(v) v.textContent=ov(i.god); var dh=slots[0].querySelector('.deity-herb-line'); if(dh) dh.textContent=i.godHerb?'Herb: '+ov(i.godHerb):''; }
+    if(slots[1]){ var v=slots[1].querySelector('.altar-val'); if(v) v.textContent=ov(i.candle); }
+    if(slots[2]){ var v=slots[2].querySelector('.altar-val'); if(v) v.textContent=ov(i.goddess); var dh=slots[2].querySelector('.deity-herb-line'); if(dh) dh.textContent=i.goddessHerb?'Herb: '+ov(i.goddessHerb):''; }
+  }
+  var circle = document.querySelector('.element-circle');
+  if(circle){
+    var s; 
+    s=circle.querySelector('.altar-slot.earth .altar-val'); if(s) s.textContent=ov(i.earth);
+    s=circle.querySelector('.altar-slot.air .altar-val');   if(s) s.textContent=ov(i.air);
+    s=circle.querySelector('.altar-slot.fire .altar-val');  if(s) s.textContent=ov(i.fire);
+    s=circle.querySelector('.altar-slot.water .altar-val'); if(s) s.textContent=ov(i.water);
+    var centre=circle.querySelector('.altar-slot.centre .altar-val'); if(centre) centre.textContent=ov(i.crystal);
+  }
+  var botRow = document.querySelector('.altar-bottom-row');
+  if(botRow){
+    var bs=botRow.querySelectorAll('.altar-slot');
+    if(bs[0]){ var v=bs[0].querySelector('.altar-val'); if(v) v.textContent=ov(i.crystal); }
+    if(bs[1]){ var v=bs[1].querySelector('.altar-val'); if(v) v.textContent=ov(i.rune); }
+    if(bs[2]){ var v=bs[2].querySelector('.altar-val'); if(v) v.textContent=ov(i.oil); }
+  }
+}
+
+function fillPageTitles(s){
+  var method = s.recommendedMethod || 'jar';
+  var methodLabel = method.charAt(0).toUpperCase() + method.slice(1);
+  var titleText = escText(s.name || 'A Spell') + ' ' + methodLabel + ' Spell';
+  document.querySelectorAll('.js-pack-spell-title').forEach(function(el){ el.textContent = titleText; });
 }
 
 function cleanName(it){
@@ -14074,10 +14113,12 @@ function showPage(page){
     const stateJSON = JSON.stringify(appState);
     const itemsJSON = JSON.stringify(GM_ITEMS);
     const kwJSON    = JSON.stringify(GM_KEYWORDS);
+    const summaryJSON = page === 'printPack' ? JSON.stringify(buildSummaryForPack(appState)) : 'null';
     const injection = `<script>
 window.__GM_STATE__    = ${stateJSON};
 window.__GM_ITEMS__    = ${itemsJSON};
 window.__GM_KEYWORDS__ = ${kwJSON};
+window.__GM_SUMMARY__  = ${summaryJSON};
 <\/script>`;
     html = html.replace('<head>', '<head>' + injection);
   }
@@ -14195,6 +14236,64 @@ window.addEventListener('message', function(ev){
 });
 
 // ── Convert appState to the format expected by printPack's loadSummaryData() ──
+function buildSummaryForPack(state){
+  var a = function(v){ return Array.isArray(v)?v:(v?[v]:[]); };
+  function gmToItem(i, label){
+    if(!i) return null;
+    var folkName = (i.o && i.o !== i.c) ? i.o : null;
+    return {
+      itemLabel: label || folkName || i.n || '',
+      name: i.n || '',
+      old: folkName || i.n || '',
+      element: a(i.el)[0] || '',
+      planet: a(i.pl)[0] || '',
+      day: a(i.dy)[0] || '',
+      energy: a(i.en)[0] || '',
+      sabbat: a((i.sb || i.sab || []))[0] || '',
+      magical: i.mu || '',
+      green: i.ge || '',
+      powers: i.pw || '',
+      folk: i.fl || ''
+    };
+  }
+  var c = state.candle || {};
+  var sel = state.selections || {};
+  var candleItem = {
+    itemLabel: (c.colour||'') + ' Candle',
+    name: (c.colour||'') + ' Candle',
+    old: (c.colour||'') + ' Candle',
+    element: c.element || '',
+    planet: '', day: '', energy: '', sabbat: '',
+    magical: (c.colour||'') + ' candle chosen for this spell.',
+    green: 'The candle carries the first flame of intention.',
+    powers: 'Flame, focus and spell direction.',
+    folk: ''
+  };
+  return {
+    spell: {
+      name: state.spell || 'A Spell',
+      category: state.category || '',
+      depth: 'A Weaving',
+      moonPhase: '', focusNumber: '', focusPlanet: '',
+      numerologyQuote: '',
+      recommendedMethod: state.method || 'jar'
+    },
+    timing: [],
+    items: {
+      candle: candleItem,
+      earth:   gmToItem(sel.earth,   'Earth Herb'),
+      air:     gmToItem(sel.air,     'Air Herb'),
+      fire:    gmToItem(sel.fire,    'Fire Herb'),
+      water:   gmToItem(sel.water,   'Water Herb'),
+      crystal: gmToItem(sel.crystal, 'Crystal'),
+      rune:    gmToItem(sel.rune,    'Rune'),
+      oil:     gmToItem(sel.oil,     'Oil'),
+      goddess: gmToItem(sel.goddess, 'Goddess'),
+      god:     gmToItem(sel.god,     'God'),
+      spellHerbs: [], goddessHerb: null, godHerb: null
+    }
+  };
+}
 function saveStateForPrintPack(state){
   try{
     var a = function(v){ return Array.isArray(v)?v:(v?[v]:[]); };
