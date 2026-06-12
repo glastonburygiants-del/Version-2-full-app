@@ -12756,7 +12756,7 @@ function chooseTier(t){
   state.shown=tierObj().initial;
   render();
 }
-function addHerb(i){const h=herbList()[i];if(!h||isComplete())return;selected.spellHerbs.push(h);render();}
+function addHerb(i){const h=herbList()[i];if(!h||isComplete())return;selected.spellHerbs.push(h);if(isComplete()){setTimeout(()=>send('extraHerbsComplete',{spellHerbs:selected.spellHerbs,tier:state.tier}),400);}else{render();}}
 function showMore(){state.shown=tierObj().max;renderCards();}
 function openAltar(){renderAltar();document.getElementById('altarOverlay').classList.add('open');}
 function closeAltar(){document.getElementById('altarOverlay').classList.remove('open');}
