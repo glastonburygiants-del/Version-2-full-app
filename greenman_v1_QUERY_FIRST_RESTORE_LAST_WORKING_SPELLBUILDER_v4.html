@@ -1976,15 +1976,16 @@ const SPELL_DATA = {"Attraction, Love & Relationships":{"icon":"\\u2764\\ufe0f",
   function getCategory(){
     try{
       var sh = JSON.parse(localStorage.getItem('gm_new_shell_spell_state_v1')||'{}');
-      return sh.category || 'Attraction, Love & Relationships';
-    }catch(e){ return 'Attraction, Love & Relationships'; }
+      return sh.category || null;
+    }catch(e){ return null; }
   }
 
   function render(){
     var cat = getCategory();
+    if(!cat){ document.getElementById('spellList').innerHTML = '<p style="color:#c9a84c;text-align:center;padding:20px">Return to the Spell Builder and select a category first.</p>'; return; }
     var data = SPELL_DATA[cat] || SPELL_DATA['Miscellaneous'];
     var spells = data.spells || [];
-    
+
     document.getElementById('catIcon').innerHTML = cat.charAt(0);
     document.getElementById('catTitle').textContent = cat;
     document.getElementById('catCount').textContent = spells.length + ' spells';
@@ -2196,7 +2197,7 @@ const CANDLE_DATA = [{"colour":"Pink","element":"Water","swatch":"radial-gradien
 
   function render(){
     var sh = getShell();
-    var cat = sh.category || 'Attraction, Love & Relationships';
+    var cat = sh.category || null;
     var spellName = (sh.spell && (sh.spell.spell || sh.spell.name)) || 'your spell';
     var catData = SPELL_DATA[cat] || SPELL_DATA['Miscellaneous'];
     var keywords = catData.keywords || [];
@@ -10007,7 +10008,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
     <!-- HEADER -->
     <div class="page-header">
       <div class="app-name">Greenman HedgeWitchery Apothecary</div>
-      <div class="spell-name">A Love Spell</div>
+      <div class="spell-name">Your Spell</div>
       <div class="spell-sub">Number 6 &middot; Ruled by Venus &middot; Waxing Crescent Moon</div>
     </div>
 
@@ -10015,7 +10016,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
     <div class="row2">
       <div class="spell-info-box">
         <div class="box-title">Spell Information</div>
-        <div class="info-row"><span class="info-label">Type</span><span class="info-val">Love &amp; Attraction</span></div>
+        <div class="info-row"><span class="info-label">Type</span><span class="info-val">—</span></div>
         <div class="info-row"><span class="info-label">Depth</span><span class="info-val">A Weaving</span></div>
         <div class="info-row"><span class="info-label">Candle</span><span class="info-val">Pink</span></div>
         <div class="info-row"><span class="info-label">Crystal</span><span class="info-val">Rose Quartz</span></div>
@@ -10201,7 +10202,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content altar-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Spell Altar</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Altar</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Expanded Tracker Altar</div>
 </header>
@@ -10246,16 +10247,16 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content instruction-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Instructions</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Instructions</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Instructions Page Hook</div>
 </header>
   <main class="instruction-box">
-    <h2 id="instructionTitle">Love Jar Instructions</h2>
+    <h2 id="instructionTitle">Your Spell Instructions</h2>
     <p class="instruction-note">This page is deliberately left as the locked hook for the final ritual instructions.</p>
     <p>The Summary page buttons choose which instruction type this page becomes:</p>
     <div class="instruction-choice-grid">
-      <div><strong>Jar</strong><br>Love Jar Instructions</div>
+      <div><strong>Jar</strong><br>Your Spell Instructions</div>
       <div><strong>Charm</strong><br>Love Charm Instructions</div>
       <div><strong>Flame Rite</strong><br>Love Flame Rite Instructions</div>
     </div>
@@ -10278,12 +10279,12 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content instruction-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Instructions</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Instructions</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Instructions Continued</div>
 </header>
   <main class="instruction-box instruction-box-extra">
-    <h2>Love Jar Instructions Continued</h2>
+    <h2>Your Spell Instructions Continued</h2>
     <p class="instruction-note">Continued instruction space.</p>
   </main>
 </div>
@@ -10299,7 +10300,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Grimoire Entry</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Grimoire Entry</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Element Herbs</div>
 </header>
@@ -10381,7 +10382,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Grimoire Entry</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Grimoire Entry</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Crystal \\u00b7 Rune \\u00b7 Oil \\u00b7 Deities</div>
 </header>
@@ -10476,7 +10477,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Grimoire Entry</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Grimoire Entry</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Extra Spell Herbs 1\\u20134</div>
 </header>
@@ -10558,7 +10559,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
 <div class="pp-content">
   <header class="pp-page-header">
   <div class="pp-app-name">Greenman HedgeWitchery</div>
-  <div class="pp-spell-title js-pack-spell-title">Love Jar Grimoire Entry</div>
+  <div class="pp-spell-title js-pack-spell-title">Your Spell Grimoire Entry</div>
   <div class="pp-count js-pack-page-count">1 of *</div>
   <div class="pp-group-title">Extra Spell Herbs 5\\u20138</div>
 </header>
@@ -10668,47 +10669,46 @@ function item(itemLabel,name,old,element,planet,day,energy,sabbat,magical,green,
   return {itemLabel:itemLabel,name:name,old:old,element:element,planet:planet,day:day,energy:energy,sabbat:sabbat,magical:magical,green:green,powers:powers};
 }
 
+function _blankItem(label){
+  return item(label,'\u2014','\u2014','\u2014','\u2014','\u2014','\u2014','\u2014','\u2014','\u2014','\u2014');
+}
 var fallbackSummary = {
   spell:{
-    name:'A Love Spell',
-    category:'Love & Attraction',
+    name:'Your Spell',
+    category:'\u2014',
     depth:'A Weaving',
-    moonPhase:'Waxing Crescent Moon',
-    focusNumber:'6',
-    focusPlanet:'Venus',
-    numerologyQuote:'Your number is 6 \\u2014 ruled by Venus, goddess of love and desire. The stars are already listening.',
+    moonPhase:'\u2014',
+    focusNumber:'',
+    focusPlanet:'',
+    numerologyQuote:'Complete the spell builder to see your spell information here.',
     recommendedMethod:'jar'
   },
   timing:[
-    ['Friday','SR+1','Venus \\u00b7 Waxing'],
-    ['Friday','SS+3','Venus \\u00b7 Waxing'],
-    ['Full Moon','Moonrise','Moon \\u00b7 Full'],
-    ['Monday','SR+2','Moon \\u00b7 Waxing'],
-    ['Monday','SS+1','Moon \\u00b7 Waxing'],
-    ['Any Day','SR+6','Venus hour'],
-    ['Sunday','SR+1','Sun \\u00b7 Waxing'],
-    ['Wednesday','SS+2','Mercury'],
-    ['Thursday','SR+3','Jupiter'],
-    ['Any Day','SS+6','Moon hour']
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014'],
+    ['\u2014','\u2014','\u2014']
   ],
   items:{
-    candle:item('Pink Candle','Pink Candle','\\u2014','Water','Venus','Friday','Feminine','Ostara','Emotional love, nurturing relationships, romance and friendship.','A soft flame for love and harmony.','Opens the heart and softens the spell.'),
-    earth:item('Oakmoss (Earth)','Oakmoss','Tree Lichen','Earth','Jupiter','Thursday','Masculine','Beltane','Grounding, protection and rooted love.','Forest bark and rain-darkened stone.','Anchoring, loyalty and steady growth.'),
-    air:item('Lavender (Air)','Lavender','Elf Leaf','Air','Mercury','Wednesday','Masculine','Midsummer','Calming, love, clarity and peace.','A breath through purple fields.','Peace, cleansing and gentle communication.'),
-    fire:item('Rosemary (Fire)','Rosemary','Dew of the Sea','Fire','Sun','Sunday','Masculine','Litha','Cleansing, love, confidence and courage.','Sea cliff and hot stone, silver needles holding the sun\\u2019s fire.','Love, memory, protection, healing and courage.'),
-    water:item('Rose Petals (Water)','Rose Petals','Flower of Venus','Water','Venus','Friday','Feminine','Ostara','Love, beauty, attraction and fidelity.','The opened heart of summer, soft and drawing.','Love, beauty, attraction, fidelity and peace.'),
-    crystal:item('Rose Quartz','Rose Quartz','Flower Quartz','Water','Venus','Friday','Feminine','Ostara','Love, happiness, peace and compassion.','Air and the blush of the opened heart.','Love, peace, happiness, fidelity and beauty.'),
-    rune:item('Gebo','Gebo','Gift Rune','Water','Venus','Friday','Feminine','Beltane','Gift, love and exchange.','A crossing of giving and receiving.','Balance, partnership and sacred exchange.'),
-    oil:item('Rose Oil','Rose Oil','Rose','Water','Venus','Friday','Feminine','Ostara','Love, romance and healing.','A garden heart pressed into oil.','Deep heart blessing and attraction.'),
-    goddess:item('Aphrodite','Aphrodite','Goddess of Love','Water','Venus','Friday','Feminine','Spring','Love, attraction and beauty.','The bright pull of desire and beauty.','Love, beauty and heart opening.'),
-    god:item('Eros','Eros','God of Desire','Fire','Mars','Tuesday','Masculine','Spring','Desire, attraction and passion.','The arrow spark of longing.','Desire, movement and flame.'),
-    spellHerbs:[
-      item('Spell Herb 1','Hibiscus','Sea-foam Blossom','Water','Venus','Friday','Feminine','Litha','Love, passion, divination and lust.','Tropical water energy, deep red and passionate.','Love, passion, fidelity and divination.'),
-      item('Spell Herb 2','Yarrow','Elf Leaf (Yarrow)','Air','Venus','Friday','Feminine','Beltane','Love, courage and healing.','The leaf that stitches charm to courage.','Healing, courage and psychic protection.'),
-      item('Spell Herb 3','Moonflower','Moonflower','Water','Moon','Monday','Feminine','Esbat','Dream love, attraction and moon blessing.','A pale bloom opening to night.','Dreams, devotion and moonlit softness.')
-    ],
-    goddessHerb:item('Goddess Herb','Vervain','Venus Crown','Water','Venus','Friday','Feminine','Beltane','Love, blessing and sacred union.','The Lady\\u2019s green blessing.','Venus herb and oath blessing.'),
-    godHerb:item('God Herb','Burdock','Horn Root','Earth','Jupiter','Thursday','Masculine','Beltane','Grounding, protection and strength.','The god-root holding deep.','Strength, grounding and protection.')
+    candle:_blankItem('Candle'),
+    earth:_blankItem('Earth Herb'),
+    air:_blankItem('Air Herb'),
+    fire:_blankItem('Fire Herb'),
+    water:_blankItem('Water Herb'),
+    crystal:_blankItem('Crystal'),
+    rune:_blankItem('Rune'),
+    oil:_blankItem('Oil'),
+    goddess:_blankItem('Goddess'),
+    god:_blankItem('God'),
+    spellHerbs:[],
+    goddessHerb:_blankItem('Goddess Herb'),
+    godHerb:_blankItem('God Herb')
   }
 };
 
@@ -11052,10 +11052,10 @@ function scaleSimplePages(){
 
 function baseSpellWord(){
   try{
-    const raw = (typeof summaryData !== 'undefined' && summaryData && summaryData.spell && summaryData.spell.name) ? summaryData.spell.name : 'Love Spell';
-    return String(raw).replace(/^A\\s+/i,'').replace(/\\s+Spell$/i,'').trim() || 'Love';
+    const raw = (typeof summaryData !== 'undefined' && summaryData && summaryData.spell && summaryData.spell.name) ? summaryData.spell.name : 'Your Spell';
+    return String(raw).replace(/^A\\s+/i,'').replace(/\\s+Spell$/i,'').trim() || 'Spell';
   }catch(e){
-    return 'Love';
+    return 'Spell';
   }
 }
 
@@ -12399,8 +12399,25 @@ window.addEventListener('message', ev=>{
   if(m.cmd==='nav') showPage(m.target);
   if(m.cmd==='gate') openGate(!!m.admin);
   if(m.cmd==='mode') setMode(m.mode);
-  if(m.cmd==='categorySelected'){ appState.category=m.category; saveState(); showPage('spellList'); }
-  if(m.cmd==='spellSelected'){ appState.spell={spell:m.spell,name:m.spell,category:appState.category||'Attraction, Love & Relationships',moonPhase:m.moonPhase}; saveState(); }
+  if(m.cmd==='categorySelected'){
+    const _cat=m.category;
+    appState=blankState();
+    appState.category=_cat;
+    try{localStorage.removeItem('greenman_spell_summary_state');localStorage.removeItem('greenman_current_spell_full');localStorage.removeItem('gm_current_spell');}catch(e){}
+    saveState();
+    showPage('spellList');
+  }
+  if(m.cmd==='spellSelected'){
+    appState.spell={spell:m.spell,name:m.spell,category:appState.category||'',moonPhase:m.moonPhase||''};
+    appState.candle=null;
+    const _blank=blankState();
+    appState.selections=_blank.selections;
+    appState.matchedUses=_blank.matchedUses;
+    appState.associationReasons={};
+    appState.method=null;
+    appState.summary=null;
+    saveState();
+  }
   if(m.cmd==='candleSelected'){ appState.candle={colour:m.colour,element:m.element}; saveState(); }
   if(m.cmd==='selectionSnapshot' || m.cmd==='selectionComplete'){
     if(m.selectionState && m.selectionState.selected){ appState.selections=m.selectionState.selected; saveState(); }
@@ -12651,7 +12668,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
   <button class="show-more" id="showMoreBtn">Show More</button>
   <section class="done-banner" id="doneBanner"><div class="done-title">Extra spell herbs complete</div><div class="done-text">All open extra spell-herb slots are filled. Continue to Crystal.</div></section>
 </div>
-<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em>A Love Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
+<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em id="altarSpellName">Your Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
 <div class="info-popup" id="infoPopup"><div class="info-sheet" id="infoSheet"></div></div>
 <nav class="tabbar"><div class="tab active"><span class="tab-icon">&#10022;</span><span class="tab-label">Spells</span></div><div class="tab"><span class="tab-icon">&#128214;</span><span class="tab-label">Grimoire</span></div><div class="tab"><span class="tab-icon">&#127769;</span><span class="tab-label">Moon</span></div><div class="tab"><span class="tab-icon">&#128290;</span><span class="tab-label">Number</span></div><div class="tab"><span class="tab-icon">&#128220;</span><span class="tab-label">Journal</span></div></nav>
 <script>
@@ -13153,7 +13170,7 @@ body.gm-print-v61 .instruction-dev-box{display:none!important;}
   <button class="show-more" id="showMoreBtn">Show More &middot; 7 More</button>
   <section class="done-banner" id="doneBanner"><div class="done-title">Deities and deity herbs complete</div><div class="done-text">The Goddess/God witness and their two herbs are chosen. Continue to Oil.</div></section>
 </div>
-<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em>A Love Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
+<div class="overlay" id="altarOverlay"><div class="altar-sheet"><div class="altar-title">&#10022; Greenman Altar View &#10022;</div><div class="altar-sub"><em id="altarSpellName">Your Spell</em> &middot; tap a filled place to see its information</div><div class="altar-row" id="altarTopRow"></div><div class="element-circle" id="elementCircle"></div><div class="altar-row bottom" id="altarBottomRow"></div><button class="close-btn" id="closeAltarBtn">&#10005; Close</button></div></div>
 <div class="info-popup" id="infoPopup"><div class="info-sheet" id="infoSheet"></div></div>
 <nav class="tabbar"><div class="tab active"><span class="tab-icon">&#10022;</span><span class="tab-label">Spells</span></div><div class="tab"><span class="tab-icon">&#128214;</span><span class="tab-label">Grimoire</span></div><div class="tab"><span class="tab-icon">&#127769;</span><span class="tab-label">Moon</span></div><div class="tab"><span class="tab-icon">&#128290;</span><span class="tab-label">Number</span></div><div class="tab"><span class="tab-icon">&#128220;</span><span class="tab-label">Journal</span></div></nav>
 <script>
