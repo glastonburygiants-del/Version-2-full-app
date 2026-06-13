@@ -13616,12 +13616,6 @@ body.gm-tracker-reserve-space{padding-top:0!important;}
 @media(min-width:700px){.page-scroll{padding-left:24px;padding-right:24px;}}
 
 
-/* ── Page layout ── */
-:root{--gold:#c9a84c;--gold2:#e8c040;--green:#2d4a1e;--green2:#1a3010;--cream:#f5ead0;--cream2:#f0ebe0;--ink:#1a0e04;--bg:#3a2a18;}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Crimson Text',Georgia,serif;min-height:100vh;}
-body{padding-top:148px;padding-bottom:16px;}
-
 .page-header{text-align:center;padding:0 16px 8px;margin-bottom:4px;}
 .step-title{font-family:'Cinzel',Georgia,serif;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin:0 0 4px;}
 .step-guide{font-family:'Crimson Text',Georgia,serif;font-style:italic;font-size:15px;color:var(--cream2);margin:0 0 4px;}
@@ -13675,6 +13669,7 @@ body{padding-top:148px;padding-bottom:16px;}
 <!-- Tracker bar injected by shell via window.__GM_STATE__ -->
 <div id="trackerMount"></div>
 
+<div class="page-scroll">
 <div class="page-header">
   <div class="step-title" id="stepTitle">Choose Your Herb</div>
   <div class="step-guide" id="stepGuide"></div>
@@ -13690,6 +13685,7 @@ body{padding-top:148px;padding-bottom:16px;}
 <div class="card-list" id="cardList"></div>
 <div class="show-more-wrap" id="showMoreWrap" style="display:none">
   <button class="btn-show-more" id="showMoreBtn" onclick="showMore()">↓ Show More</button>
+</div>
 </div>
 
 <!-- Info overlay — empty until filled by engine -->
@@ -13990,6 +13986,205 @@ render();
 <\/script>
 </body>
 </html>`,
+  grimoire: `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Greenman — Grimoire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#2a1a08;--green:#2d4a1e;--gold:#c9a84c;--gold2:#e8c040;--gold3:#c9a000;--cream:#faf6ec;--cream2:#f0ebe0;--ink:#1a0e04;}
+html,body{height:100%;background:var(--bg);color:#e8dfc8;font-family:'Crimson Text',Georgia,serif;overflow:hidden;}
+.page-scroll{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:820px;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 24px;}
+.grim-header{background:var(--green);border-bottom:2px solid var(--gold);padding:10px 12px 8px;position:sticky;top:0;z-index:50;}
+.grim-title{font-family:'Cinzel',Georgia,serif;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);text-align:center;margin-bottom:7px;}
+.grim-filters{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:6px;}
+.gf-btn{-webkit-appearance:none;appearance:none;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.5);border-radius:20px;font-family:'Cinzel',Georgia,serif;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);padding:4px 10px;cursor:pointer;}
+.gf-btn.active{background:var(--gold2);border-color:var(--gold3);color:#1a0e04;}
+.grim-search{padding:0 12px 8px;background:var(--green);}
+.grim-search input{width:100%;background:#1a3010;border:1px solid rgba(201,168,76,.5);border-radius:6px;padding:8px 10px;color:#e8dfc8;font-family:'Crimson Text',Georgia,serif;font-size:15px;outline:none;-webkit-appearance:none;appearance:none;}
+.grim-search input::placeholder{color:#7a6040;}
+.grim-count{font-family:'Cinzel',Georgia,serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#7a6040;text-align:center;padding:6px 0 2px;background:var(--green);border-bottom:1px solid rgba(201,168,76,.25);}
+.grim-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.gi-card{background:var(--cream);border:1.5px solid rgba(201,168,76,.5);border-radius:9px;overflow:hidden;touch-action:manipulation;}
+.gi-head{padding:9px 12px 6px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+.gi-type-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.gi-names{flex:1;min-width:0;}
+.gi-old{font-family:'IM Fell English',Georgia,serif;font-size:19px;color:var(--ink);line-height:1.1;}
+.gi-modern{font-family:'Crimson Text',Georgia,serif;font-weight:700;font-size:13px;color:#5a3a08;}
+.gi-latin{font-family:'Crimson Text',Georgia,serif;font-style:italic;font-size:11px;color:#8a6030;}
+.gi-meta{text-align:right;flex-shrink:0;}
+.gi-type{font-family:'Cinzel',Georgia,serif;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);display:block;}
+.gi-el{font-family:'Cinzel',Georgia,serif;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7a6040;display:block;margin-top:2px;}
+.gi-mu{padding:4px 12px 8px;font-family:'Crimson Text',Georgia,serif;font-size:13px;color:#5a3a08;font-style:italic;border-top:1px solid rgba(201,168,76,.2);}
+.gi-actions{display:flex;gap:6px;padding:6px 12px 9px;}
+.gi-info-btn{-webkit-appearance:none;appearance:none;flex:1;background:var(--green);border:1.5px solid var(--gold);border-radius:6px;padding:7px;font-family:'Cinzel',Georgia,serif;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gold2);cursor:pointer;}
+.gi-info-btn:active{background:#1a3010;}
+.empty-msg{text-align:center;padding:40px 20px;font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;color:#7a6040;}
+.info-overlay{position:fixed;inset:0;background:rgba(10,6,2,.88);z-index:600;display:none;align-items:center;justify-content:center;padding:16px;}
+.info-overlay.open{display:flex;}
+.info-sheet{width:100%;max-width:440px;max-height:90vh;overflow-y:auto;background:var(--cream);border:2px solid var(--gold);border-radius:12px;padding:14px;color:var(--ink);}
+.is-name-block{text-align:center;padding:8px 8px 10px;border-bottom:2px solid rgba(201,168,76,.3);margin-bottom:10px;}
+.is-type{font-family:'Cinzel',Georgia,serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7a5a10;margin-bottom:4px;}
+.is-old{font-family:'IM Fell English',Georgia,serif;font-size:28px;color:var(--ink);line-height:1.05;}
+.is-modern{font-family:'Crimson Text',Georgia,serif;font-weight:700;font-size:16px;color:var(--ink);}
+.is-latin{font-family:'Crimson Text',Georgia,serif;font-style:italic;font-size:13px;color:#7a5a10;}
+.is-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.is-sq{background:var(--cream2);border:1px solid rgba(201,168,76,.42);border-radius:3px;padding:8px;}
+.is-sq.full{grid-column:1/-1;}
+.is-sq-label{font-family:'Cinzel',Georgia,serif;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5a3a08;margin-bottom:4px;}
+.is-sq-text{font-family:'Crimson Text',Georgia,serif;font-size:14px;color:var(--ink);font-weight:600;line-height:1.4;}
+.is-sq-text.green{color:#2a4a15;font-style:italic;}
+.is-close{-webkit-appearance:none;appearance:none;width:100%;min-height:44px;margin-top:12px;border-radius:8px;background:var(--gold2);border:3px solid var(--gold3);color:#2a1a00;font-family:'Cinzel',Georgia,serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+.bottom-tabbar,.tabbar,nav.tabbar{display:none!important;}
+</style>
+</head>
+<body>
+<div class="page-scroll">
+  <div class="grim-header">
+    <div class="grim-title">✦ Greenman Grimoire ✦</div>
+    <div class="grim-filters" id="typeFilters">
+      <button class="gf-btn active" data-type="All" onclick="setType('All')">All</button>
+      <button class="gf-btn" data-type="Herb" onclick="setType('Herb')">Herbs</button>
+      <button class="gf-btn" data-type="Crystal" onclick="setType('Crystal')">Crystals</button>
+      <button class="gf-btn" data-type="Rune" onclick="setType('Rune')">Runes</button>
+      <button class="gf-btn" data-type="Deity" onclick="setType('Deity')">Deities</button>
+      <button class="gf-btn" data-type="Oil" onclick="setType('Oil')">Oils</button>
+    </div>
+    <div class="grim-filters" id="elFilters">
+      <button class="gf-btn active" data-el="All" onclick="setEl('All')">All Elements</button>
+      <button class="gf-btn" data-el="Earth" onclick="setEl('Earth')">🌍 Earth</button>
+      <button class="gf-btn" data-el="Air" onclick="setEl('Air')">💨 Air</button>
+      <button class="gf-btn" data-el="Fire" onclick="setEl('Fire')">🔥 Fire</button>
+      <button class="gf-btn" data-el="Water" onclick="setEl('Water')">💧 Water</button>
+    </div>
+  </div>
+  <div class="grim-search">
+    <input type="text" id="searchInput" placeholder="Search by name, uses, powers…" oninput="render()">
+  </div>
+  <div class="grim-count" id="grimCount"></div>
+  <div class="grim-list" id="grimList"></div>
+</div>
+
+<div class="info-overlay" id="infoOverlay">
+  <div class="info-sheet" id="infoSheet"></div>
+</div>
+
+<script>
+const ALL_ITEMS = window.__GM_ITEMS__ || [];
+
+const TYPE_COLOURS = {Herb:'#2d7a30',Crystal:'#5a3a8a',Rune:'#7a4a18',Deity:'#1a4a8a',Oil:'#7a6a20'};
+
+let activeType = 'All';
+let activeEl   = 'All';
+
+function norm(v){ return String(v||'').toLowerCase(); }
+function arr(v){ return Array.isArray(v)?v:(v?[v]:[]);  }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function setType(t){
+  activeType = t;
+  document.querySelectorAll('#typeFilters .gf-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+  render();
+}
+function setEl(e){
+  activeEl = e;
+  document.querySelectorAll('#elFilters .gf-btn').forEach(b=>b.classList.toggle('active',b.dataset.el===e));
+  render();
+}
+
+function filtered(){
+  const q = norm(document.getElementById('searchInput').value);
+  return ALL_ITEMS.filter(i=>{
+    if(activeType !== 'All' && i.c !== activeType) return false;
+    if(activeEl   !== 'All' && !arr(i.el).some(e=>norm(e)===norm(activeEl))) return false;
+    if(!q) return true;
+    return norm([i.n,i.o,i.la,i.mu,i.pw,i.ge,i.fl].join(' ')).includes(q);
+  });
+}
+
+function muShort(mu){
+  if(!mu) return '';
+  const parts = String(mu).split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=3) return parts.join(', ');
+  return parts.slice(0,3).join(', ') + '…';
+}
+
+function buildCard(item){
+  const dot = TYPE_COLOURS[item.c]||'#7a6040';
+  const elText = arr(item.el).join(' / ');
+  const oldName = item.o || item.n || '';
+  const modernName = item.o ? item.n : '';
+  return \`<div class="gi-card">
+  <div class="gi-head" onclick="showInfo(this)" data-key="\${esc(item.n)}">
+    <div class="gi-type-dot" style="background:\${dot}"></div>
+    <div class="gi-names">
+      <div class="gi-old">\${esc(oldName)}</div>
+      \${modernName ? \`<div class="gi-modern">\${esc(modernName)}</div>\` : ''}
+      \${item.la ? \`<div class="gi-latin">\${esc(item.la)}</div>\` : ''}
+    </div>
+    <div class="gi-meta">
+      <span class="gi-type">\${esc(item.c||'')}</span>
+      \${elText ? \`<span class="gi-el">\${esc(elText)}</span>\` : ''}
+    </div>
+  </div>
+  \${item.mu ? \`<div class="gi-mu">\${esc(muShort(item.mu))}</div>\` : ''}
+  <div class="gi-actions">
+    <button class="gi-info-btn" onclick='openInfo(\${JSON.stringify(item)})'>Full Details</button>
+  </div>
+</div>\`;
+}
+
+function render(){
+  const list = filtered();
+  const el = document.getElementById('grimList');
+  const cnt = document.getElementById('grimCount');
+  cnt.textContent = list.length + ' ' + (list.length===1?'item':'items');
+  el.innerHTML = list.length ? list.map(buildCard).join('') : '<div class="empty-msg">No items found.<br>Try adjusting your filters.</div>';
+}
+
+function openInfo(item){
+  const elText = arr(item.el).join(' / ');
+  const oldName = item.o || item.n || '';
+  const modernName = item.o ? item.n : '';
+  let html = \`<div class="is-name-block">
+    <div class="is-type">\${esc(item.c||'')}</div>
+    <div class="is-old">\${esc(oldName)}</div>
+    \${modernName ? \`<div class="is-modern">\${esc(modernName)}</div>\` : ''}
+    \${item.la ? \`<div class="is-latin">\${esc(item.la)}</div>\` : ''}
+  </div>
+  <div class="is-grid">\`;
+  if(elText) html += \`<div class="is-sq"><div class="is-sq-label">Element</div><div class="is-sq-text">\${esc(elText)}</div></div>\`;
+  if(item.pl) html += \`<div class="is-sq"><div class="is-sq-label">Planet</div><div class="is-sq-text">\${esc(item.pl)}</div></div>\`;
+  if(item.mu) html += \`<div class="is-sq full"><div class="is-sq-label">Magical Uses</div><div class="is-sq-text">\${esc(item.mu)}</div></div>\`;
+  if(item.pw) html += \`<div class="is-sq full"><div class="is-sq-label">Powers</div><div class="is-sq-text">\${esc(item.pw)}</div></div>\`;
+  if(item.ge) html += \`<div class="is-sq full"><div class="is-sq-label">Greenman Energy</div><div class="is-sq-text green">\${esc(item.ge)}</div></div>\`;
+  if(item.fl) html += \`<div class="is-sq full"><div class="is-sq-label">Folk Lore</div><div class="is-sq-text">\${esc(item.fl)}</div></div>\`;
+  if(item.ah) html += \`<div class="is-sq full"><div class="is-sq-label">Associated Herbs</div><div class="is-sq-text">\${esc(item.ah)}</div></div>\`;
+  if(item.ac) html += \`<div class="is-sq full"><div class="is-sq-label">Associated Crystals</div><div class="is-sq-text">\${esc(item.ac)}</div></div>\`;
+  if(item.en) html += \`<div class="is-sq full"><div class="is-sq-label">Energy</div><div class="is-sq-text">\${esc(arr(item.en).join(', '))}</div></div>\`;
+  html += \`</div><button class="is-close" onclick="closeInfo()">✦ Close ✦</button>\`;
+  document.getElementById('infoSheet').innerHTML = html;
+  document.getElementById('infoOverlay').classList.add('open');
+}
+
+function showInfo(el){
+  const key = el.dataset.key;
+  const item = ALL_ITEMS.find(i=>i.n===key);
+  if(item) openInfo(item);
+}
+
+function closeInfo(){
+  document.getElementById('infoOverlay').classList.remove('open');
+}
+
+render();
+<\/script>
+</body>
+</html>`,
 };
 
 // ══════════════════════════════════════════════
@@ -14073,7 +14268,7 @@ function showPage(page){
   let html = PAGES[page];
 
   // Inject state + data for pages that need it
-  if(['selection','candle','printPack','extraHerbs','deityHerbs'].includes(page)){
+  if(['selection','candle','printPack','extraHerbs','deityHerbs','grimoire'].includes(page)){
     const stateJSON = JSON.stringify(appState);
     const itemsJSON = JSON.stringify(GM_ITEMS);
     const kwJSON    = JSON.stringify(GM_KEYWORDS);
