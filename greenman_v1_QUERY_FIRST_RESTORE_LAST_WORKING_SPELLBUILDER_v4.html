@@ -12395,7 +12395,9 @@ function deleteCaptures(indexes){
   }catch(e){}
 }
 window.addEventListener('message', ev=>{
-  const m=ev.data||{}; if(m.source!=='greenman-new-shell-v1') return;
+  const m=ev.data||{};
+  const _ok = m.source==='greenman-new-shell-v1' || m.source==='greenman-selection-v2';
+  if(!_ok) return;
   if(m.cmd==='nav') showPage(m.target);
   if(m.cmd==='gate') openGate(!!m.admin);
   if(m.cmd==='mode') setMode(m.mode);
