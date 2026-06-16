@@ -324,17 +324,20 @@ window.addEventListener('message', ev=>{
     appState.method=null;
     appState.summary=null;
     saveState();
+    saveSummaryToLocalStorage();
   }
-  if(m.cmd==='candleSelected'){ appState.candle={colour:m.colour,element:m.element}; saveState(); }
+  if(m.cmd==='candleSelected'){ appState.candle={colour:m.colour,element:m.element}; saveState(); saveSummaryToLocalStorage(); }
   if(m.cmd==='selectionSnapshot' || m.cmd==='selectionComplete'){
     if(m.selectionState && m.selectionState.selected){ appState.selections=m.selectionState.selected; saveState(); }
-    if(m.cmd==='selectionComplete'){ saveSummaryToLocalStorage(); showPage('printPack'); }
+    saveSummaryToLocalStorage();
+    if(m.cmd==='selectionComplete'){ showPage('printPack'); }
   }
   if(m.cmd==='extraHerbsSnapshot' || m.cmd==='extraHerbsComplete'){
     if(!appState.selections) appState.selections={};
     appState.selections.spellHerbs = Array.isArray(m.spellHerbs) ? m.spellHerbs : [];
     if(m.cmd==='extraHerbsComplete'){ appState.selectionPage='deity'; }
     saveState();
+    saveSummaryToLocalStorage();
     if(m.cmd==='extraHerbsComplete'){ showPage('selection'); }
   }
   if(m.cmd==='methodSelected'){ appState.method=normalizeMethod(m.method); saveState(); saveSummaryToLocalStorage(); }
