@@ -1630,150 +1630,437 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
 
 
 <script>
-/* GM SUMMARY PATCH — fills missing fields on the summary page */
+/* ================================================================
+   PRINT PAGES RENDER PATCH
+   Fills all placeholder IDs on pages 18-25 from tracker state.
+   Timing rows built from each chosen item's Planet + Day fields.
+   ================================================================ */
 (function(){
   'use strict';
 
   const STORE = 'gm_current_spell_v11';
   const $ = id => document.getElementById(id);
-  const set = (id, val) => { const el=$(id); if(el) el.textContent = (val==null?'':String(val)).trim(); };
-  const t = v => (v==null?'':String(v)).trim();
-  const first = (...xs) => xs.map(t).find(Boolean) || '';
+  const qa = (s, root=document) => Array.from(root.querySelectorAll(s));
+  const t = v => (v == null ? '' : String(v)).trim();
+  const set = (id, val) => { const el=$(id); if(el) el.textContent = t(val); };
   const load = () => { try{ return JSON.parse(localStorage.getItem(STORE)||'{}')||{}; }catch(e){ return{}; } };
 
-  const getName = r => !r ? '' : typeof r==='string' ? r :
-    first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Color, r.Colour);
-  const getOld = r => !r ? '' : first(r['Ye Olde Name'], r['Olde Name'], '');
-
-  /* Altar positions for each item in the spell build order */
-  const POSITIONS = [
-    'Candle',   // 1 - candle
-    'North',    // 2 - earth herb
-    'East',     // 3 - air herb
-    'South',    // 4 - fire herb
-    'West',     // 5 - water herb
-    'Centre',   // 6 - spell herb 1
-    'Centre',   // 7 - spell herb 2 (if weaving/grove)
-    'Centre',   // 8 - spell herb 3
-    'Centre',   // 9 - spell herb 4
-    'Centre',   // 10 - spell herb 5
-    'Altar',    // 11 - crystal
-    'Altar',    // 12 - rune
-  ];
-
-  /* Moon phase → best time of day */
-  const moonTime = phase => {
-    const p = t(phase).toLowerCase();
-    if(p.includes('new')) return 'Midnight · New Moon';
-    if(p.includes('wax')) return 'Dawn to Noon · Waxing Moon';
-    if(p.includes('full')) return 'Midnight to 3am · Full Moon';
-    if(p.includes('wan')) return 'Dusk to Midnight · Waning Moon';
-    if(p.includes('gibb')) return 'Evening · Gibbous Moon';
-    if(p.includes('cresc')) return 'Afternoon · Crescent Moon';
-    return t(phase);
+  /* ── Getters (same as main engine) ── */
+  const first = (...xs) => xs.map(t).find(Boolean) || '';
+  const getName  = r => !r?'': typeof r==='string'?r : first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Color, r.Colour);
+  const getOld   = r => !r?'': first(r['Ye Olde Name'], r['Olde Name'], '');
+  const getLatin = r => !r?'': first(r['Latin Name'], r.Latin, '');
+  const getEl    = r => !r?'': first(r.Element, '');
+  const getPlanet= r => !r?'': first(r.Planet, '');
+  const getDay   = r => !r?'': first(r.Day, r['Day of Week'], r['Sacred Day'], '');
+  const getEnergy= r => !r?'': first(r.Energy, r.Polarity, r.Gender, '');
+  const getUses  = r => !r?'': first(r['Magical Uses'], r['Magical Use'], '');
+  const getPowers= r => !r?'': first(r.Powers, '');
+  const getFolk  = r => !r?'': first(r['Folk Lore'], r['Famous Magic'], r.Description, '');
+  const getSpirit= r => !r?'': first(r['Spiritual Uses'], r.Description, r['How To Use'], '');
+  const getWhy   = r => !r?'': first(r.Association, r.Description, '');
+  const energyField = mode => {
+    const m = t(mode).toLowerCase();
+    if(m.includes('draw'))   return 'Greenman Energy — Draw';
+    if(m.includes('hold'))   return 'Greenman Energy — Hold';
+    if(m.includes('release'))return 'Greenman Energy — Release';
+    if(m.includes('open')||m.includes('reveal')) return 'Greenman Energy — Open / Reveal';
+    if(m.includes('transform')||m.includes('turn')) return 'Greenman Energy — Transform / Turn';
+    if(m.includes('18'))     return 'Greenman Energy — Over 18';
+    return 'Greenman Energy — Main';
   };
+  const getGM = (r, sd) => !r?'': first(
+    r[energyField(sd?.['Greenman Energy Mode'] || sd?.gmMode)],
+    r['Greenman Energy — Main'], r['Greenman Energy'], ''
+  );
 
-  /* Day of week → planetary hour suggestion */
-  const dayHour = day => {
-    const d = t(day).toLowerCase();
-    if(d.includes('sun')) return 'Sunday · Solar Hour';
-    if(d.includes('mon')) return 'Monday · Lunar Hour';
-    if(d.includes('tue')) return 'Tuesday · Mars Hour';
-    if(d.includes('wed')) return 'Wednesday · Mercury Hour';
-    if(d.includes('thu')) return 'Thursday · Jupiter Hour';
-    if(d.includes('fri')) return 'Friday · Venus Hour';
-    if(d.includes('sat')) return 'Saturday · Saturn Hour';
-    return t(day);
-  };
+  /* ── Fill a full info card (element herbs / crystal / rune / oil / deity print pages) ── */
+  function fillCard(prefix, item, sd) {
+    if(!item) return;
+    set(prefix+'-name',           getName(item));
+    set(prefix+'-old',            getOld(item));
+    set(prefix+'-latin',          getLatin(item));
+    set(prefix+'-magical-uses',   getUses(item));
+    set(prefix+'-greenman-energy',getGM(item, sd));
+    set(prefix+'-powers',         getPowers(item));
+    set(prefix+'-why',            getWhy(item));
+    set(prefix+'-how',            getSpirit(item));
+    set(prefix+'-note',           getFolk(item));
+  }
 
-  function patchSummary() {
+  /* ── Fill tag row (element/planet/day/energy with numbered suffix) ── */
+  function fillTags(sfx, item) {
+    if(!item) return;
+    set('element'+sfx,  getEl(item));
+    set('planet'+sfx,   getPlanet(item));
+    set('day'+sfx,      getDay(item));
+    set('energy'+sfx,   getEnergy(item));
+  }
+
+  /* ================================================================
+     PAGE 18 — Summary (timing rows + goddess/god fix)
+     ================================================================ */
+  function renderSummaryExtra() {
     const sp = load();
     const sd = sp.sd || {};
 
-    /* Goddess & God — missing from original renderSummary */
+    /* Goddess & God names (missing from original renderSummary) */
     set('summary-goddess', getName(sp.goddess));
-    set('summary-god', getName(sp.god));
+    set('summary-god',     getName(sp.god));
 
-    /* Position labels — inside each altar slot */
-    const all = [
-      ['Candle', sp.candle],
-      ['Earth', sp.earth],
-      ['Air', sp.air],
-      ['Fire', sp.fire],
-      ['Water', sp.water],
+    /* Timing rows — one per chosen item, using that item's Planet + Day */
+    const items = [
+      ['Candle',   sp.candle],
+      ['Earth',    sp.earth],
+      ['Air',      sp.air],
+      ['Fire',     sp.fire],
+      ['Water',    sp.water],
       ...((sp.extraHerbs||[]).map((x,i) => ['Spell Herb '+(i+1), x])),
-      ['Crystal', sp.crystal],
-      ['Rune', sp.rune],
-      ['Goddess', sp.goddess],
-      ['God', sp.god],
-      ['Oil', sp.oil],
-    ].filter(x => x[1]);
+      ['Crystal',  sp.crystal],
+      ['Rune',     sp.rune],
+      ['Goddess',  sp.goddess],
+      ['God',      sp.god],
+      ['Oil',      sp.oil],
+    ].filter(([,r]) => r && (getPlanet(r)||getDay(r)));
 
-    all.slice(0,12).forEach(([label, item], i) => {
-      /* Re-render altar slot with position label included */
-      const slot = $('summary-altar-' + (i+1));
-      if(slot) {
-        const pos = POSITIONS[i] || label;
-        const itemName = getOld(item) || getName(item);
-        slot.innerHTML =
-          `<span class="al">${pos}</span>` +
-          `<span class="an">${label}</span>` +
-          itemName;
-      }
+    const sfxList = ['','2','3','4','5','6','7','8','9','10'];
+    items.slice(0,10).forEach(([label, item], i) => {
+      const sfx = sfxList[i];
+      const planet = getPlanet(item);
+      const day    = getDay(item);
+      const moon   = first(sd['Moon Phase'], '');
+      set('day'        + sfx, day    || label);
+      set('time'       + sfx, moon ? moon+' Moon' : 'Any time');
+      set('planetMoon' + sfx, planet || label);
     });
 
-    /* Timing slots — up to 10 rows from spell type data */
-    const moonPhase = first(sd['Moon Phase'], sd['Moon'], '');
-    const sacredDay = first(sd['Sacred Day'], sd['Day'], '');
-    const planet    = first(sd.Planet, '');
-    const sabbat    = first(sd.Sabbat, sd.Sabbats, '');
-    const element   = first(sd.Element, '');
-    const direction = first(sd['Elemental Direction'], '');
+    /* Altar position labels */
+    const POSITIONS = ['Candle','North','East','South','West',
+      'Centre','Centre','Centre','Centre','Centre','Altar','Altar'];
+    const all = [
+      ['Candle', sp.candle], ['Earth', sp.earth], ['Air', sp.air],
+      ['Fire', sp.fire], ['Water', sp.water],
+      ...((sp.extraHerbs||[]).map((x,i)=>['Spell Herb '+(i+1),x])),
+      ['Crystal',sp.crystal],['Rune',sp.rune],
+      ['Goddess',sp.goddess],['God',sp.god],['Oil',sp.oil],
+    ].filter(x=>x[1]);
+    all.slice(0,12).forEach(([label,item],i)=>{
+      const slot = $('summary-altar-'+(i+1));
+      if(slot) slot.innerHTML =
+        `<span class="al">${POSITIONS[i]||label}</span>`+
+        `<span class="an">${label}</span>`+
+        (getOld(item)||getName(item));
+    });
+  }
 
-    const timingRows = [
-      sacredDay ? [sacredDay, moonTime(moonPhase), planet ? planet+' hour' : moonPhase] : null,
-      moonPhase ? ['Any day', moonTime(moonPhase), moonPhase] : null,
-      sacredDay ? [dayHour(sacredDay), 'Planetary Hour', planet] : null,
-      sabbat    ? [sabbat, 'All day', planet || moonPhase] : null,
-      element   ? [direction || element, element+' tide', planet] : null,
-    ].filter(Boolean);
+  /* ================================================================
+     PAGE 19 — Altar layout
+     ================================================================ */
+  function renderAltarPage() {
+    const sp = load();
+    set('print-pack-altar-spell-title', sp.spell || 'Spell');
+    set('print-pack-altar-page-count', 'Altar Layout');
 
-    const daySfx  = ['','2','3','4','5','6','7','8','9','10'];
-    timingRows.forEach((row, i) => {
-      const sfx = daySfx[i];
-      set('day'       + sfx, row[0]);
-      set('time'      + sfx, row[1]);
-      set('planetMoon'+ sfx, row[2]);
+    /* Top row: Goddess / Candle / God */
+    set('topSlot1',  'Goddess');
+    set('item',      getName(sp.goddess));
+    set('herbLine',  getOld(sp.goddess));
+    set('topSlot2',  'Candle');
+    set('item2',     getName(sp.candle));
+    set('herbLine2', '');
+    set('topSlot3',  'God');
+    set('item3',     getName(sp.god));
+    set('herbLine3', getOld(sp.god));
+
+    /* Circle: Earth N / Air E / Fire S / Water W / Extra centre */
+    set('earthSlot', getName(sp.earth));
+    set('airSlot',   getName(sp.air));
+    set('fireSlot',  getName(sp.fire));
+    set('waterSlot', getName(sp.water));
+    (sp.extraHerbs||[]).slice(0,7).forEach((h,i)=>{
+      set('altar-extra-herb-'+(i+1), getName(h));
     });
 
-    /* Numerology alignment */
-    if(!$('summary-alignment')?.textContent && sp.numNum) {
-      const numRow = (window.GM_DATA?.Numerology||[]).find(x=>String(x.Number)===String(sp.numNum));
-      const planet = numRow ? first(numRow.Planet, '') : '';
-      set('summary-alignment', `Personal number ${sp.numNum}${planet ? ' · '+planet : ''}`);
+    /* Bottom row: Crystal / Oil / Rune */
+    set('bottomSlot1', 'Crystal'); set('item4', getName(sp.crystal));
+    set('bottomSlot2', 'Oil');     set('item5', getName(sp.oil));
+    set('bottomSlot3', 'Rune');    set('item6', getName(sp.rune));
+  }
+
+  /* ================================================================
+     PAGE 20 & 21 — Instructions (The Making + The Greenman's Voice)
+     Steps are built from the spell method and chosen items.
+     ================================================================ */
+  function buildSteps(sp) {
+    const sd = sp.sd || {};
+    const method = sp.method || first(sd['Recommended Spell Method'], 'Spell Jar');
+    const spell  = sp.spell  || 'your spell';
+    const candle = getName(sp.candle);
+    const earth  = getName(sp.earth);
+    const air    = getName(sp.air);
+    const fire   = getName(sp.fire);
+    const water  = getName(sp.water);
+    const extras = (sp.extraHerbs||[]).map(getName).filter(Boolean).join(', ') || 'spell herbs';
+    const crystal= getName(sp.crystal);
+    const rune   = getName(sp.rune);
+    const oil    = getName(sp.oil);
+    const goddess= getName(sp.goddess);
+    const god    = getName(sp.god);
+    const moon   = first(sd['Moon Phase'], 'the right');
+    const day    = first(sd['Sacred Day'], 'the chosen');
+
+    const isJar   = /jar/i.test(method);
+    const isSmoke = /smoke|flame/i.test(method);
+    const isCharm = /charm|bag/i.test(method);
+
+    let making, voice;
+
+    if(isJar) {
+      making = [
+        `Cleanse your space and gather: ${candle} candle, ${earth} (Earth), ${air} (Air), ${fire} (Fire), ${water} (Water), ${extras}, ${crystal}, ${rune}, ${oil} oil.`,
+        `Cast your circle in the ${first(sd['Elemental Direction'],'South')} direction. Light the ${candle} candle, saying the spell name aloud: "${spell}".`,
+        `Place the ${earth} herb into the jar — Earth brings grounding and foundation.`,
+        `Add ${air} — Air brings movement and intention into the working.`,
+        `Add ${fire} — Fire seals the will and burns away obstacles.`,
+        `Add ${water} — Water opens the emotional channels of the spell.`,
+        `Add your spell herbs (${extras}) one by one, holding each and naming its purpose.`,
+        `Anoint the jar with ${oil} oil in a sunwise circle. Seal with wax from the ${candle} candle.`,
+        `Hold the ${crystal} over the sealed jar. Let its energy charge the working.`,
+        `Trace the ${rune} rune on the outside of the jar three times.`,
+        `Call upon ${goddess} and ${god} to witness and strengthen the spell.`,
+        `Place the jar on your altar. Let the candle burn fully if safe to do so.`,
+        `On the next ${day}, hold the jar and repeat the intention three times.`,
+        `When the spell is complete, bury the jar or keep it on your altar until the ${moon} moon.`,
+      ];
+      voice = [
+        `"By earth and air, by fire and sea — as I will, so shall it be."`,
+        `"I cast this circle in love and truth. No harm shall come, no ill pursue."`,
+        `"${earth}, root of earth — anchor this spell in the deep and sure."`,
+        `"${air}, breath of sky — carry my will on the wind this hour."`,
+        `"${fire}, flame of will — burn clear the path that I require."`,
+        `"${water}, tide of heart — let feeling flow and open true."`,
+        `"Herbs of the Greenman, lend your voice — your power now becomes my choice."`,
+        `"Sealed in oil, sealed in flame — this working carries ${spell}'s name."`,
+        `"Stone of ${crystal}, hold and keep — this intention set, this promise deep."`,
+        `"Rune of ${rune}, written thrice — bind this working, make it precise."`,
+        `"${goddess} and ${god}, I call to thee — witness, strengthen, set this free."`,
+        `"Upon this altar, so it rests — charged by moon and manifest."`,
+        `"As the ${moon} moon turns, so this working builds — as I will, so is filled."`,
+        `"The spell is made, the will is cast — from this moment, binding fast."`,
+      ];
+    } else if(isSmoke) {
+      making = [
+        `Gather: ${candle} candle, ${earth}, ${air}, ${fire}, ${water}, ${extras}, ${crystal}, ${rune}, ${oil} oil, a fire-safe bowl.`,
+        `Light the ${candle} candle and place it South. Open your circle.`,
+        `Combine ${earth}, ${air}, ${fire}, ${water} in the bowl — these are the elemental base.`,
+        `Add ${extras} to the blend. Mix sunwise three times while naming the spell: "${spell}".`,
+        `Anoint your hands and forehead with ${oil} oil.`,
+        `Place ${crystal} beside the bowl as an amplifier.`,
+        `Trace ${rune} in the air above the blend.`,
+        `Light the blend — let the smoke carry the intention upward.`,
+        `Pass the ${crystal} through the smoke nine times.`,
+        `Call upon ${goddess} to open the way and ${god} to carry the working forward.`,
+        `Let the smoke carry the intention for as long as the blend burns.`,
+        `Allow the bowl to cool. Keep the ash wrapped in cloth until the ${moon} moon.`,
+        `On ${day}, scatter the ash to the wind or bury it with intention.`,
+        `Close the circle, thanking ${goddess} and ${god}.`,
+      ];
+      voice = [
+        `"Smoke and flame, rise and speak — the Greenman's will this working seeks."`,
+        `"I open my circle in the name of ${spell}."`,
+        `"Earth grounds, air moves, fire transforms, water flows — this blend holds all."`,
+        `"${extras} — spell herbs of the Greenman — your power joins this smoke."`,
+        `"Anointed in ${oil}, I am vessel for this working."`,
+        `"${crystal}, amplify and clarify all that rises here."`,
+        `"${rune}, written in air, bind the intention to this smoke."`,
+        `"Rise, smoke — carry the will of ${spell} to where it must go."`,
+        `"Nine times through the smoke, this crystal charged and set to work."`,
+        `"${goddess} open the way. ${god}, carry it forward."`,
+        `"As the smoke rises, so the intention is made manifest."`,
+        `"Ash of the working, you hold what was said — rest until the ${moon} moon."`,
+        `"To the wind (or earth) I release this working. So it is done."`,
+        `"I close this circle with gratitude. The work is complete."`,
+      ];
+    } else {
+      // Charm bag
+      making = [
+        `Gather a cloth bag (${first(sd['Elemental Colors'],'green or gold')}), ${candle} candle, ${earth}, ${air}, ${fire}, ${water}, ${extras}, ${crystal}, ${rune}, ${oil} oil.`,
+        `Light the ${candle} candle. Hold the bag and name its purpose: "${spell}".`,
+        `Place ${earth} in the bag — for grounding.`,
+        `Add ${air} — for carrying intention.`,
+        `Add ${fire} — for the force of will.`,
+        `Add ${water} — for emotional resonance.`,
+        `Add ${extras} one by one, naming each herb's gift as it enters the bag.`,
+        `Anoint the outside of the bag with ${oil} oil, drawing a spiral.`,
+        `Place ${crystal} inside — the stone holds the charge.`,
+        `Tuck the ${rune} symbol (written on paper or the rune itself) into the bag.`,
+        `Call upon ${goddess} and ${god} to breathe life into the charm.`,
+        `Tie the bag with three knots, naming the intention with each knot.`,
+        `Carry the charm or place it on your altar until ${moon} moon.`,
+        `To close the working, bury the bag or cast its contents to the wind.`,
+      ];
+      voice = [
+        `"I make this charm in the name of ${spell}. Let it carry true."`,
+        `"Greenman, witness this bag of working — born of intention, bound in will."`,
+        `"${earth} — you are the root. Enter here."`,
+        `"${air} — you are the breath. Enter here."`,
+        `"${fire} — you are the spark. Enter here."`,
+        `"${water} — you are the flow. Enter here."`,
+        `"Each herb brings its power — together they are greater than their parts."`,
+        `"Anointed in ${oil}, this charm is sealed in the Greenman's name."`,
+        `"${crystal}, you are the heart of this charm — hold the charge and keep it true."`,
+        `"${rune}, you are the word of this charm — name it and it shall be."`,
+        `"${goddess} and ${god}, breathe life into this working. So be it."`,
+        `"First knot — I set the intention. Second knot — I bind the will. Third knot — it is done."`,
+        `"Carry your work, little charm, until the ${moon} moon fulfils it."`,
+        `"When the time is complete, I return you to the earth with thanks."`,
+      ];
+    }
+    return { making, voice };
+  }
+
+  function renderInstructions1() {
+    const sp = load();
+    set('print-pack-instructions-1-spell-title', sp.spell||'Spell');
+    set('print-pack-instructions-1-page-count',  'Instructions · Page 1');
+    set('print-pack-instructions-1-title',       sp.spell||'Your Spell');
+    set('print-pack-instructions-1-subtitle',    'A Greenman HedgeWitchery Working');
+    set('print-pack-instructions-1-tagline',     (sp.sd?.['Wording Focus']||'').slice(0,120));
+    set('print-pack-instructions-1-footer',      'Greenman HedgeWitchery · Page 1 of 2');
+    const {making, voice} = buildSteps(sp);
+    for(let i=1;i<=8;i++){
+      set('making-step-'+i+'-text', making[i-1]||'');
+      set('voice-step-'+i+'-text',  voice[i-1]||'');
     }
   }
 
-  /* Hook into page loads */
-  function maybeRun() {
-    const file = window.GM_CURRENT_FILE || '';
-    if(file.includes('summary')) patchSummary();
+  function renderInstructions2() {
+    const sp = load();
+    set('print-pack-instructions-2-spell-title', sp.spell||'Spell');
+    set('print-pack-instructions-2-page-count',  'Instructions · Page 2');
+    set('print-pack-instructions-2-title',       sp.spell||'Your Spell');
+    set('print-pack-instructions-2-subtitle',    'A Greenman HedgeWitchery Working');
+    set('print-pack-instructions-2-tagline',     (sp.sd?.['Instruction Notes']||'').slice(0,120));
+    set('print-pack-instructions-2-footer',      'Greenman HedgeWitchery · Page 2 of 2');
+    const {making, voice} = buildSteps(sp);
+    for(let i=9;i<=14;i++){
+      set('making-step-'+i+'-text', making[i-1]||'');
+      set('voice-step-'+i+'-text',  voice[i-1]||'');
+    }
   }
 
-  /* Wrap GM_SINGLE_LOAD */
+  /* ================================================================
+     PAGE 22 — Element Herbs
+     ================================================================ */
+  function renderElementHerbsPage() {
+    const sp = load();
+    const sd = sp.sd||{};
+    set('21-print-pack-element-herbs-spell-title',  sp.spell||'Spell');
+    set('21-print-pack-element-herbs-page-count',   'Element Herbs');
+    const items = [
+      ['info-card-earth-herb-1', sp.earth,  ''],
+      ['info-card-air-herb-2',   sp.air,    '2'],
+      ['info-card-fire-herb-3',  sp.fire,   '3'],
+      ['info-card-water-herb-4', sp.water,  '4'],
+    ];
+    items.forEach(([prefix, item, sfx]) => {
+      fillCard(prefix, item, sd);
+      fillTags(sfx, item);
+    });
+  }
+
+  /* ================================================================
+     PAGE 23 — Items & Deities (Crystal / Rune / Oil / Goddess / God)
+     ================================================================ */
+  function renderItemsAndDeitiesPage() {
+    const sp = load();
+    const sd = sp.sd||{};
+    set('print-pack-items-deities-spell-title', sp.spell||'Spell');
+    set('print-pack-items-deities-page-count',  'Crystal · Rune · Oil · Deities');
+    const items = [
+      ['info-card-crystal-1',  sp.crystal, ''],
+      ['info-card-rune-2',     sp.rune,    '2'],
+      ['info-card-oil-3',      sp.oil,     '3'],
+      ['info-card-goddess-4',  sp.goddess, '4'],
+      ['info-card-god-5',      sp.god,     '5'],
+    ];
+    items.forEach(([prefix, item, sfx]) => {
+      fillCard(prefix, item, sd);
+      fillTags(sfx, item);
+    });
+  }
+
+  /* ================================================================
+     PAGE 24 — Spell Herbs 1–4
+     ================================================================ */
+  function renderSpellHerbs1to4() {
+    const sp = load();
+    const sd = sp.sd||{};
+    set('23-print-pack-spell-herbs-1-4-spell-title', sp.spell||'Spell');
+    set('23-print-pack-spell-herbs-1-4-page-count',  'Spell Herbs 1–4');
+    const extras = sp.extraHerbs||[];
+    [
+      ['info-card-spell-herb-1-1', extras[0], ''],
+      ['info-card-spell-herb-2-2', extras[1], '2'],
+      ['info-card-spell-herb-3-3', extras[2], '3'],
+      ['info-card-spell-herb-4-4', extras[3], '4'],
+    ].forEach(([prefix, item, sfx]) => {
+      fillCard(prefix, item, sd);
+      fillTags(sfx, item);
+    });
+  }
+
+  /* ================================================================
+     PAGE 25 — Spell Herbs 5–8
+     ================================================================ */
+  function renderSpellHerbs5to8() {
+    const sp = load();
+    const sd = sp.sd||{};
+    set('24-print-pack-spell-herbs-5-8-spell-title', sp.spell||'Spell');
+    set('24-print-pack-spell-herbs-5-8-page-count',  'Spell Herbs 5–8');
+    const extras = sp.extraHerbs||[];
+    [
+      ['info-card-spell-herb-5-1', extras[4], ''],
+      ['info-card-spell-herb-6-2', extras[5], '2'],
+      ['info-card-spell-herb-7-3', extras[6], '3'],
+      ['info-card-spell-herb-8-4', extras[7], '4'],
+    ].forEach(([prefix, item, sfx]) => {
+      fillCard(prefix, item, sd);
+      fillTags(sfx, item);
+    });
+  }
+
+  /* ================================================================
+     DISPATCH — wire render to the right page
+     ================================================================ */
+  function dispatch(file) {
+    if(!file) return;
+    if(file.includes('18_summary'))          renderSummaryExtra();
+    else if(file.includes('19_print'))       renderAltarPage();
+    else if(file.includes('20_instructions_1')) renderInstructions1();
+    else if(file.includes('21_instructions_2')) renderInstructions2();
+    else if(file.includes('22_element'))     renderElementHerbsPage();
+    else if(file.includes('23_items'))       renderItemsAndDeitiesPage();
+    else if(file.includes('24_spell_herbs')) renderSpellHerbs1to4();
+    else if(file.includes('25_spell_herbs')) renderSpellHerbs5to8();
+  }
+
+  /* Hook GM_SINGLE_LOAD */
   const _orig = window.GM_SINGLE_LOAD;
-  if(typeof _orig === 'function' && !_orig.__summaryPatch) {
+  if(typeof _orig === 'function' && !_orig.__ppPatch) {
     window.GM_SINGLE_LOAD = function(file) {
       _orig(file);
-      if(file.includes('summary')) setTimeout(patchSummary, 100);
+      setTimeout(() => dispatch(file), 80);
     };
-    window.GM_SINGLE_LOAD.__summaryPatch = true;
+    window.GM_SINGLE_LOAD.__ppPatch = true;
     Object.keys(_orig).forEach(k => { window.GM_SINGLE_LOAD[k] = _orig[k]; });
   }
 
-  /* Also catch initial page load */
-  document.addEventListener('DOMContentLoaded', maybeRun);
-  setTimeout(maybeRun, 200);
+  document.addEventListener('DOMContentLoaded', () => {
+    const file = window.GM_CURRENT_FILE || '';
+    dispatch(file);
+  });
+  setTimeout(() => dispatch(window.GM_CURRENT_FILE||''), 150);
 
 })();
 
