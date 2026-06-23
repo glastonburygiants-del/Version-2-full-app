@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>01_category_numerology.html</title>
+<style>
+
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --app-max:780px;
+  --bg:#2a1a08;
+  --green:#2d4a1e;
+  --dark:#1a1208;
+  --parch:#faf6ec;
+  --brown:#8a6a30;
+  --gold:#c9a84c;
+  --gold2:#e8c040;
+  --goldborder:#c9a000;
+  --text:#e8dfc8;
+  --dim:#a08840;
+}
+body{background:var(--bg);font-family:'Crimson Text',serif;color:var(--text);padding-bottom:74px;}
+.app-shell{max-width:var(--app-max);margin:0 auto;min-height:100vh;background:var(--bg);position:relative;}
+.header{position:sticky;top:0;z-index:50;background:var(--green);border-bottom:2px solid var(--gold);padding:12px 12px 10px;display:flex;align-items:center;gap:12px;}
+.title-block{flex:1;min-width:0;}
+.eyebrow{font-family:'Crimson Text',serif;font-style:italic;font-size:13px;color:#faf6ec;line-height:1;}
+.main-title{font-family:'Cinzel',serif;font-size:clamp(18px,4.8vw,25px);font-weight:700;letter-spacing:0.08em;color:var(--gold);text-transform:uppercase;line-height:1.15;}
+.subtitle{font-family:'Crimson Text',serif;font-style:italic;font-size:13px;color:#e8dfc8;line-height:1.2;margin-top:1px;}
+.grimoire-btn{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#e8c97a;background:#4a3a18;border:2px solid var(--gold);border-radius:7px;padding:8px 9px;min-width:70px;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-appearance:none;appearance:none;cursor:pointer;}
+.grimoire-btn span{font-size:18px;line-height:1;}
+.page{padding:12px 12px 18px;}
+.dark-control{background:var(--dark);border:1px solid rgba(201,168,76,0.32);border-radius:10px;padding:10px 11px;margin-bottom:12px;}
+.dark-label{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.init-prompt{font-family:'IM Fell English',serif;font-style:italic;font-size:16px;color:#faf6ec;line-height:1.35;margin-bottom:3px;}
+.init-note{font-family:'Crimson Text',serif;font-style:italic;font-size:12px;color:#a08840;line-height:1.3;margin-bottom:8px;}
+.init-row{display:flex;align-items:stretch;gap:6px;margin-bottom:7px;}
+.init-box{flex:1;background:#2a1a08;border:2px solid rgba(201,168,76,0.55);border-radius:7px;min-height:46px;padding:6px 8px;display:flex;align-items:center;gap:7px;cursor:pointer;}
+.init-box.active{border-color:var(--gold);background:#1a3010;}
+.letters{display:flex;gap:5px;}
+.letter-cell{width:36px;height:32px;border-radius:5px;border:1px solid rgba(201,168,76,0.45);background:#ede8d8;color:#2a1a00;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:18px;font-weight:700;}
+.letter-cell.empty{color:transparent;}
+.init-help{flex:1;font-family:'Crimson Text',serif;font-style:italic;font-size:12px;color:#c9b87a;line-height:1.2;display:flex;align-items:center;}
+.small-gold{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2a1a00;background-color:var(--gold2);border:2px solid var(--goldborder);border-radius:6px;padding:0 9px;cursor:pointer;-webkit-appearance:none;appearance:none;min-width:56px;}
+.energy-row{display:flex;gap:5px;margin-bottom:7px;}
+.epill{flex:1;font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border-radius:20px;padding:6px 4px;cursor:pointer;-webkit-appearance:none;appearance:none;border:2px solid rgba(201,168,76,0.35);background:rgba(201,168,76,0.08);color:#a08840;}
+.epill.on{background:#c9a84c;color:#2a1a00;border-color:#e8c040;}
+.action-row{display:flex;gap:6px;align-items:center;}
+.begin-btn{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2a1a00;background-color:var(--gold2);border:2px solid var(--goldborder);border-radius:6px;padding:8px 12px;cursor:pointer;-webkit-appearance:none;appearance:none;}
+.skip-btn{font-family:'Crimson Text',serif;font-size:13px;font-style:italic;color:#e8dfc8;background:transparent;border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:7px 10px;cursor:pointer;-webkit-appearance:none;appearance:none;}
+.welcome{display:none;margin-top:7px;background:#e8c97a;border:1px solid var(--gold);border-radius:6px;padding:8px 9px;font-family:'Crimson Text',serif;font-style:italic;font-size:13px;color:#3a2010;line-height:1.35;}
+.seek{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#c9a84c;text-align:center;margin:12px 0 9px;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.cat-btn{background:#1a1208;border:1px solid rgba(201,168,76,0.38);border-radius:10px;min-height:84px;padding:9px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;cursor:pointer;-webkit-appearance:none;appearance:none;}
+.cat-btn:active{border-color:var(--gold);background:#1a3010;}
+.cat-icon{font-size:23px;line-height:1;}
+.cat-name{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#ffffff;line-height:1.25;}
+.cat-count{font-family:'Crimson Text',serif;font-style:italic;font-size:12px;color:#a08840;}
+.divider{height:1px;background:rgba(201,168,76,0.25);margin:13px 0 10px;}
+.adult-btn{width:100%;background:#2a1018;border:2px solid rgba(200,80,100,0.45);border-radius:10px;min-height:54px;color:#ffffff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;-webkit-appearance:none;appearance:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.adult-btn span{font-size:18px;}
+.tabbar{position:fixed;left:50%;bottom:0;transform:translateX(-50%);max-width:var(--app-max);width:100%;background:var(--green);border-top:2px solid var(--gold);display:flex;padding:6px 0 8px;z-index:90;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tab-icon{font-size:16px;line-height:1;}
+.tab-label{font-family:'Cinzel',serif;font-size:7px;letter-spacing:0.08em;color:#8a9a7a;text-transform:uppercase;}
+.tab.active .tab-label{color:var(--gold);}
+.overlay{position:fixed;inset:0;background:rgba(10,6,2,0.72);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.kb{width:100%;max-width:var(--app-max);background:#1a1208;border-top:3px solid var(--gold);border-left:1px solid rgba(201,168,76,0.25);border-right:1px solid rgba(201,168,76,0.25);padding:12px;box-shadow:0 -8px 20px rgba(0,0,0,0.35);}
+.kb-top{background:#2a1a08;border:2px solid rgba(201,168,76,0.55);border-radius:7px;padding:8px 10px;margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+.kb-title{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);flex:1;}
+.kb-mini{font-family:'Crimson Text',serif;font-style:italic;font-size:12px;color:#a08840;}
+.kb-row{display:flex;gap:4px;margin-bottom:5px;}
+.k{flex:1;min-height:40px;border-radius:6px;background:#3a2a10;border:1px solid rgba(201,168,76,0.35);color:#e8dfc8;font-family:'Cinzel',serif;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none;}
+.k.act{background:#2d4a1e;color:#c9a84c;border-color:#c9a84c;}
+.k.gold{background:#e8c040;border:2px solid #c9a000;color:#2a1a00;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;}
+.k.w2{flex:2.1;}
+.pop-card{background:#4a3a10;border:2px solid var(--gold);border-radius:12px;max-width:330px;width:calc(100% - 28px);padding:18px;margin:auto;color:#fff;}
+.pop-title{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:0.08em;text-transform:uppercase;}
+.pop-text{font-family:'Crimson Text',serif;font-size:15px;line-height:1.45;color:#fff;margin-bottom:14px;}
+.pop-actions{display:flex;gap:8px;}
+@media (min-width:700px){
+  .page{padding-left:22px;padding-right:22px;}
+  .cat-grid{gap:10px;}
+  .cat-btn{min-height:94px;}
+}
+
+
+/* NEW SHELL VERSION 1 runtime display fixes only. Locked source files are untouched. */
+.bottom-tabbar,.tabbar.app-fixed,nav.bottom-tabbar,nav.tabbar{display:none!important;}
+.logic-panel,.review-logic,.developer-note,.fallback-note{display:none!important;}
+body{padding-bottom:0!important;}
+/* compact spell tracker on phone screens */
+@media(max-width:520px){
+  .tracker{padding:3px 4px!important;}
+  .tracker-spell{font-size:8px!important;letter-spacing:.08em!important;margin-bottom:2px!important;}
+  .tracker-grid{gap:2px!important;grid-template-columns:1fr 1fr 1fr 1fr 44px!important;}
+  .ts,.deity-s{min-height:28px!important;padding:2px 1px!important;border-width:1px!important;}
+  .tl,.deity-s .tl{font-size:6.5px!important;letter-spacing:0!important;}
+  .td,.deity-s .td{font-size:8px!important;margin-top:0!important;}
+  .tv{font-size:8px!important;margin-top:0!important;}
+  .ts-spell{min-height:25px!important;}
+  .page-scroll{top:auto!important;bottom:auto!important;}
+}
+
+body.gm-print-v61{padding-bottom:0!important;}
+body.gm-print-v61 .fallback-note{display:none!important;}
+body.gm-print-v61 .instruction-dev-box{display:none!important;}
+
+/* OPEN-BOWL OVERRIDES: no app tabs, no real engine, keep page skin */
+.tabbar,.bottom-tabbar,nav.tabbar,nav.bottom-tabbar,.note-panel,.correction-note,.fallback-note,.developer-note,.logic-panel,.review-logic{display:none!important;}
+body{padding-bottom:0!important;overflow:auto!important;}
+button,[data-action],[data-nav]{cursor:pointer;}
+[data-engine-slot], [data-placeholder-id]{outline:1px dashed rgba(232,192,64,.28);outline-offset:-2px;}
+.placeholder-text{font-style:italic;color:rgba(42,26,8,.72)!important;}
+.open-id{display:block;font-family:Cinzel,serif;font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:#7a5a10;margin-top:3px;word-break:break-word;}
+.viewer-pad{padding-bottom:32px;}
+
+</style>
+</head>
+<body>
+<div class="app-shell" data-step="spell-category" id="spell-category" data-builder-home="true" data-preserve-spell-state="true"><div class="header"><div class="title-block"><div class="eyebrow">The</div><div class="main-title">Greenman HedgeWitchery Spell Builder</div><div class="subtitle"><span data-placeholder-id="subtitle" id="subtitle"></span></div></div></div><main class="page viewer-pad"><section class="dark-control" data-engine-slot="initials" id="initials-panel"><div class="dark-label">✦ Personal Touch — Optional</div><div class="init-prompt" data-placeholder-id="initials-prompt" id="initials-prompt"></div><div class="init-note" data-placeholder-id="initials-note" id="initials-note"></div><div class="init-row"><div class="init-box" data-action="open-initial-keyboard" id="initials-box"><div class="letters"><div class="letter-cell empty" data-placeholder-id="initial-first" id="initial-first"></div><div class="letter-cell empty" data-placeholder-id="initial-last" id="initial-last"></div></div><div class="init-help"><span data-placeholder-id="initialsHelp" id="initialsHelp"></span></div></div><button class="small-gold" data-action="clear-initials" id="initials-clear-btn">Clear</button></div><div class="energy-row" id="energy-buttons"><button class="epill" data-action="set-energy-goddess" id="energy-goddess-btn">☽ Goddess</button><button class="epill" data-action="set-energy-god" id="energy-god-btn">☀ God</button><button class="epill" data-action="set-energy-dual" id="energy-dual-btn">☽ ☀ Dual</button></div><div class="action-row"><button class="begin-btn" data-action="continue-to-category-grid" id="begin-with-initials-btn">Begin</button><button class="skip-btn" data-action="continue-to-category-grid" id="skip-initials-btn">Skip for now</button></div><div class="welcome" data-placeholder-id="numerology-preview" id="numerology-preview"></div></section><div class="seek">✦ What magic do you seek? ✦</div>
+<section class="cat-grid" data-engine-slot="spell-categories" id="category-grid"><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-1" data-lite-category-index="1"><span class="cat-icon" id="category-icon-1">💕</span><span class="cat-name" data-placeholder-id="category-name-1" id="category-name-1"></span><span class="cat-count" data-placeholder-id="category-count-1" id="category-count-1"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-2" data-lite-category-index="2"><span class="cat-icon" id="category-icon-2">🛡</span><span class="cat-name" data-placeholder-id="category-name-2" id="category-name-2"></span><span class="cat-count" data-placeholder-id="category-count-2" id="category-count-2"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-3" data-lite-category-index="3"><span class="cat-icon" id="category-icon-3">🔮</span><span class="cat-name" data-placeholder-id="category-name-3" id="category-name-3"></span><span class="cat-count" data-placeholder-id="category-count-3" id="category-count-3"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-4" data-lite-category-index="4"><span class="cat-icon" id="category-icon-4">💧</span><span class="cat-name" data-placeholder-id="category-name-4" id="category-name-4"></span><span class="cat-count" data-placeholder-id="category-count-4" id="category-count-4"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-5" data-lite-category-index="5"><span class="cat-icon" id="category-icon-5">⚡</span><span class="cat-name" data-placeholder-id="category-name-5" id="category-name-5"></span><span class="cat-count" data-placeholder-id="category-count-5" id="category-count-5"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-6" data-lite-category-index="6"><span class="cat-icon" id="category-icon-6">🌾</span><span class="cat-name" data-placeholder-id="category-name-6" id="category-name-6"></span><span class="cat-count" data-placeholder-id="category-count-6" id="category-count-6"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-7" data-lite-category-index="7"><span class="cat-icon" id="category-icon-7">🏠</span><span class="cat-name" data-placeholder-id="category-name-7" id="category-name-7"></span><span class="cat-count" data-placeholder-id="category-count-7" id="category-count-7"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-8" data-lite-category-index="8"><span class="cat-icon" id="category-icon-8">☽</span><span class="cat-name" data-placeholder-id="category-name-8" id="category-name-8"></span><span class="cat-count" data-placeholder-id="category-count-8" id="category-count-8"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-9" data-lite-category-index="9"><span class="cat-icon" id="category-icon-9">🌸</span><span class="cat-name" data-placeholder-id="category-name-9" id="category-name-9"></span><span class="cat-count" data-placeholder-id="category-count-9" id="category-count-9"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-10" data-lite-category-index="10"><span class="cat-icon" id="category-icon-10">🌱</span><span class="cat-name" data-placeholder-id="category-name-10" id="category-name-10"></span><span class="cat-count" data-placeholder-id="category-count-10" id="category-count-10"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-11" data-lite-category-index="11"><span class="cat-icon" id="category-icon-11">☀</span><span class="cat-name" data-placeholder-id="category-name-11" id="category-name-11"></span><span class="cat-count" data-placeholder-id="category-count-11" id="category-count-11"></span></button><button class="cat-btn" data-action="select-category" data-nav="spell-list" id="category-btn-12" data-lite-category-index="12"><span class="cat-icon" id="category-icon-12">⚗</span><span class="cat-name" data-placeholder-id="category-name-12" id="category-name-12"></span><span class="cat-count" data-placeholder-id="category-count-12" id="category-count-12"></span></button></section>
+<div class="divider"></div>
+<button class="adult-btn" data-action="locked-over18-lite" id="category-over18-btn" aria-disabled="true" disabled><span>⛔</span> Over 18 — Locked in Lite Mode</button></main></div>
+
+
+<script>
+// ── SHARED HELPERS (from main engine script[2]) ──
+const getName = (r)=> first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Spell, r.Color, r.Colour);
+const getOld = (r)=> first(r['Ye Olde Name'], r['Olde Name'], r.YeOlde, '');
+  const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+  const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+const getElement = (r)=> first(r.Element, '');
+  const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+  const energyField = (modeName) => {
+const getGM = (r, sp)=> first(r[energyField(sp?.gmMode || sp?.['Greenman Energy Mode'])], r['Greenman Energy — Main'], r['Greenman Energy Main'], r['Greenman Energy'], '');
+const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+  const getElement = (r)=> first(r.Element, '');
+const shorten = (s,n=180)=>{s=t(s); return s.length>n?s.slice(0,n-1)+'…':s;};
+  const slug = (s)=>lc(s).replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+function load(){ try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return{};} }
+function save(sp){ localStorage.setItem(STORE, JSON.stringify(sp||{})); }
+function reset(){ localStorage.removeItem(STORE); }
+function go(key){ const target = pages[key] || key; if(window.GM_SINGLE_LOAD){ window.GM_SINGLE_LOAD(target); } else { location.href = target; } }
+function goBack(){ if(window.GM_SINGLE_BACK){ window.GM_SINGLE_BACK(); return; } history.length>1 ? history.back() : go('start'); }
+
+// ── RENDER FUNCTION FOR THIS PAGE ──
+// Page: 01_category_numerology.html
+function renderCategories(){
+    setupKeyboard();
+    const cats=[]; const seen=new Set();
+    spellRows().forEach(r=>{const c=t(r.Category); if(c&&!seen.has(c)){seen.add(c); cats.push(c);}});
+    const normal=cats.filter(c=>!lc(c).includes('over 18'));
+    const over=cats.find(c=>lc(c).includes('over 18'));
+    const icons=['💕','🛡️','🔮','💧','⚡','🌾','🏠','☽','🌸','🌱','☀','⚗'];
+    normal.slice(0,12).forEach((c,i)=>{
+      const btn=$(`category-btn-${i+1}`); if(!btn) return;
+      set(`category-name-${i+1}`, c); set(`category-count-${i+1}`, `${spellRows().filter(r=>t(r.Category)===c).length} spells`);
+      const ic=$(`category-icon-${i+1}`); if(ic) ic.textContent=icons[i]||'✦';
+      btn.onclick=()=>{const sp=load(); sp.category=c; delete sp.spell; delete sp.sd; save(sp); go('list');};
+    });
+    if(over){
+      let adult=$('adult-over18-btn');
+      if(!adult){ adult=document.createElement('button'); adult.id='adult-over18-btn'; adult.className='adult-btn'; adult.innerHTML='<span>🔞</span> Over 18'; $('category-grid')?.after(adult); }
+      adult.style.opacity = mode()==='lite' ? '.35' : '1';
+      adult.onclick=()=>{ if(mode()==='lite'){ alert('Over 18 spells are locked in Lite mode.'); return;} const sp=load(); sp.category=over; save(sp); go('list'); };
+    }
+  }
+</script>
+</body>
+</html>
