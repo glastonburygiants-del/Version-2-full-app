@@ -1628,66 +1628,155 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
 })();
 </script>
 
+
 <script>
-/* GM FLICKER FIX */
+/* GM SUMMARY PATCH — fills missing fields on the summary page */
 (function(){
   'use strict';
 
-  var SHOW_DELAY = 280;
+  const STORE = 'gm_current_spell_v11';
+  const $ = id => document.getElementById(id);
+  const set = (id, val) => { const el=$(id); if(el) el.textContent = (val==null?'':String(val)).trim(); };
+  const t = v => (v==null?'':String(v)).trim();
+  const first = (...xs) => xs.map(t).find(Boolean) || '';
+  const load = () => { try{ return JSON.parse(localStorage.getItem(STORE)||'{}')||{}; }catch(e){ return{}; } };
 
-  function hideApp(){
-    var app = document.getElementById('gm-app');
-    if(app) app.style.visibility = 'hidden';
+  const getName = r => !r ? '' : typeof r==='string' ? r :
+    first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Color, r.Colour);
+  const getOld = r => !r ? '' : first(r['Ye Olde Name'], r['Olde Name'], '');
+
+  /* Altar positions for each item in the spell build order */
+  const POSITIONS = [
+    'Candle',   // 1 - candle
+    'North',    // 2 - earth herb
+    'East',     // 3 - air herb
+    'South',    // 4 - fire herb
+    'West',     // 5 - water herb
+    'Centre',   // 6 - spell herb 1
+    'Centre',   // 7 - spell herb 2 (if weaving/grove)
+    'Centre',   // 8 - spell herb 3
+    'Centre',   // 9 - spell herb 4
+    'Centre',   // 10 - spell herb 5
+    'Altar',    // 11 - crystal
+    'Altar',    // 12 - rune
+  ];
+
+  /* Moon phase → best time of day */
+  const moonTime = phase => {
+    const p = t(phase).toLowerCase();
+    if(p.includes('new')) return 'Midnight · New Moon';
+    if(p.includes('wax')) return 'Dawn to Noon · Waxing Moon';
+    if(p.includes('full')) return 'Midnight to 3am · Full Moon';
+    if(p.includes('wan')) return 'Dusk to Midnight · Waning Moon';
+    if(p.includes('gibb')) return 'Evening · Gibbous Moon';
+    if(p.includes('cresc')) return 'Afternoon · Crescent Moon';
+    return t(phase);
+  };
+
+  /* Day of week → planetary hour suggestion */
+  const dayHour = day => {
+    const d = t(day).toLowerCase();
+    if(d.includes('sun')) return 'Sunday · Solar Hour';
+    if(d.includes('mon')) return 'Monday · Lunar Hour';
+    if(d.includes('tue')) return 'Tuesday · Mars Hour';
+    if(d.includes('wed')) return 'Wednesday · Mercury Hour';
+    if(d.includes('thu')) return 'Thursday · Jupiter Hour';
+    if(d.includes('fri')) return 'Friday · Venus Hour';
+    if(d.includes('sat')) return 'Saturday · Saturn Hour';
+    return t(day);
+  };
+
+  function patchSummary() {
+    const sp = load();
+    const sd = sp.sd || {};
+
+    /* Goddess & God — missing from original renderSummary */
+    set('summary-goddess', getName(sp.goddess));
+    set('summary-god', getName(sp.god));
+
+    /* Position labels — inside each altar slot */
+    const all = [
+      ['Candle', sp.candle],
+      ['Earth', sp.earth],
+      ['Air', sp.air],
+      ['Fire', sp.fire],
+      ['Water', sp.water],
+      ...((sp.extraHerbs||[]).map((x,i) => ['Spell Herb '+(i+1), x])),
+      ['Crystal', sp.crystal],
+      ['Rune', sp.rune],
+      ['Goddess', sp.goddess],
+      ['God', sp.god],
+      ['Oil', sp.oil],
+    ].filter(x => x[1]);
+
+    all.slice(0,12).forEach(([label, item], i) => {
+      /* Re-render altar slot with position label included */
+      const slot = $('summary-altar-' + (i+1));
+      if(slot) {
+        const pos = POSITIONS[i] || label;
+        const itemName = getOld(item) || getName(item);
+        slot.innerHTML =
+          `<span class="al">${pos}</span>` +
+          `<span class="an">${label}</span>` +
+          itemName;
+      }
+    });
+
+    /* Timing slots — up to 10 rows from spell type data */
+    const moonPhase = first(sd['Moon Phase'], sd['Moon'], '');
+    const sacredDay = first(sd['Sacred Day'], sd['Day'], '');
+    const planet    = first(sd.Planet, '');
+    const sabbat    = first(sd.Sabbat, sd.Sabbats, '');
+    const element   = first(sd.Element, '');
+    const direction = first(sd['Elemental Direction'], '');
+
+    const timingRows = [
+      sacredDay ? [sacredDay, moonTime(moonPhase), planet ? planet+' hour' : moonPhase] : null,
+      moonPhase ? ['Any day', moonTime(moonPhase), moonPhase] : null,
+      sacredDay ? [dayHour(sacredDay), 'Planetary Hour', planet] : null,
+      sabbat    ? [sabbat, 'All day', planet || moonPhase] : null,
+      element   ? [direction || element, element+' tide', planet] : null,
+    ].filter(Boolean);
+
+    const daySfx  = ['','2','3','4','5','6','7','8','9','10'];
+    timingRows.forEach((row, i) => {
+      const sfx = daySfx[i];
+      set('day'       + sfx, row[0]);
+      set('time'      + sfx, row[1]);
+      set('planetMoon'+ sfx, row[2]);
+    });
+
+    /* Numerology alignment */
+    if(!$('summary-alignment')?.textContent && sp.numNum) {
+      const numRow = (window.GM_DATA?.Numerology||[]).find(x=>String(x.Number)===String(sp.numNum));
+      const planet = numRow ? first(numRow.Planet, '') : '';
+      set('summary-alignment', `Personal number ${sp.numNum}${planet ? ' · '+planet : ''}`);
+    }
   }
 
-  function showApp(){
-    var app = document.getElementById('gm-app');
-    if(app) app.style.visibility = '';
+  /* Hook into page loads */
+  function maybeRun() {
+    const file = window.GM_CURRENT_FILE || '';
+    if(file.includes('summary')) patchSummary();
   }
 
   /* Wrap GM_SINGLE_LOAD */
-  var _origLoad = window.GM_SINGLE_LOAD;
-  if(typeof _origLoad === 'function' && !_origLoad.__flickerFix){
-    window.GM_SINGLE_LOAD = function(file){
-      window.GM_CURRENT_FILE = file;
-      hideApp();
-      _origLoad(file);
-      setTimeout(showApp, SHOW_DELAY);
+  const _orig = window.GM_SINGLE_LOAD;
+  if(typeof _orig === 'function' && !_orig.__summaryPatch) {
+    window.GM_SINGLE_LOAD = function(file) {
+      _orig(file);
+      if(file.includes('summary')) setTimeout(patchSummary, 100);
     };
-    window.GM_SINGLE_LOAD.__flickerFix = true;
-    window.GM_SINGLE_LOAD.__deityFix = true;
-    Object.keys(_origLoad).forEach(function(k){ window.GM_SINGLE_LOAD[k] = _origLoad[k]; });
+    window.GM_SINGLE_LOAD.__summaryPatch = true;
+    Object.keys(_orig).forEach(k => { window.GM_SINGLE_LOAD[k] = _orig[k]; });
   }
 
-  /* Wrap GM_SINGLE_BACK */
-  var _origBack = window.GM_SINGLE_BACK;
-  if(typeof _origBack === 'function' && !_origBack.__flickerFix){
-    window.GM_SINGLE_BACK = function(){
-      hideApp();
-      _origBack();
-      setTimeout(showApp, SHOW_DELAY);
-    };
-    window.GM_SINGLE_BACK.__flickerFix = true;
-  }
-
-  /* Kill the setInterval(700) from v17 */
-  var _origSetInterval = window.setInterval;
-  var _v17Killed = false;
-  window.setInterval = function(fn, ms){
-    if(!_v17Killed && ms === 700){
-      _v17Killed = true;
-      return 0;
-    }
-    return _origSetInterval.apply(this, arguments);
-  };
-
-  /* Initial page load */
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(showApp, SHOW_DELAY);
-  });
+  /* Also catch initial page load */
+  document.addEventListener('DOMContentLoaded', maybeRun);
+  setTimeout(maybeRun, 200);
 
 })();
-</script>
 
+</script>
 </body>
 </html>
