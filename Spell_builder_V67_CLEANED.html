@@ -509,95 +509,20 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
 <script id="gm-v16-extra-herbs-flow-fix">
 (function(){
   'use strict';
-  const STORE='gm_current_spell_v11';
-  const EXTRA_FILES=['09_extra_herbs_handful.html','10_extra_herbs_weaving.html','11_extra_herbs_full_grove.html'];
-  const EXTRA_MAP=[
-    ['Handful',1,'09_extra_herbs_handful.html'],
-    ['Weaving',3,'10_extra_herbs_weaving.html'],
-    ['Full Grove',7,'11_extra_herbs_full_grove.html']
-  ];
-  const getSP=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return{};}};
-  const saveSP=(sp)=>localStorage.setItem(STORE,JSON.stringify(sp||{}));
-  const current=()=>window.GM_CURRENT_FILE||'';
-  const isExtra=()=>EXTRA_FILES.includes(current());
-  const rawLoad=(file)=>{ if(typeof window.GM_SINGLE_LOAD==='function') window.GM_SINGLE_LOAD(file); };
-  function addStyle(){
-    if(document.getElementById('gm-v16-style')) return;
-    const st=document.createElement('style');
-    st.id='gm-v16-style';
-    st.textContent=`
-      #gm-app .gm-extra-depth-panel{background:#1a1208;border:1px solid rgba(201,168,76,.42);border-radius:10px;padding:9px 10px;margin:8px 0 10px;text-align:center;}
-      #gm-app .gm-extra-depth-title{font-family:Cinzel,serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;}
-      #gm-app .gm-extra-depth-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-      #gm-app .gm-extra-depth-btn{min-height:42px;border-radius:7px;border:2px solid rgba(201,168,76,.5);background:#2a1a08;color:#e8dfc8;font-family:Cinzel,serif;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:6px 3px;}
-      #gm-app .gm-extra-depth-btn.active{background:#e8c040;color:#2a1a00;border:3px solid #c9a000;}
-      #gm-app .gm-extra-progress{font-family:'Crimson Text',serif;font-style:italic;color:#e8dfc8;font-size:13px;margin-top:6px;}
-    `;
-    document.head.appendChild(st);
-  }
-  function ensureExtraDepthPanel(){
-    if(!isExtra()) return;
-    addStyle();
-    const sp=getSP();
-    const max=Number(sp.extraMax||1);
-    let panel=document.getElementById('gm-extra-depth-panel');
-    if(!panel){
-      panel=document.createElement('div');
-      panel.id='gm-extra-depth-panel';
-      panel.className='gm-extra-depth-panel';
-      const scroll=document.querySelector('.page-scroll')||document.querySelector('main')||document.body;
-      const anchor=scroll.querySelector('.guidance')||scroll.firstElementChild;
-      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(panel, anchor.nextSibling);
-      else scroll.insertBefore(panel, scroll.firstChild);
-    }
-    const chosen=(sp.extraHerbs||[]).length;
-    panel.innerHTML=`<div class="gm-extra-depth-title">Change spell depth while gathering herbs</div><div class="gm-extra-depth-row">${EXTRA_MAP.map(([label,count,file])=>`<button type="button" class="gm-extra-depth-btn ${count===max?'active':''}" data-extra-depth-file="${file}" data-extra-depth-max="${count}" data-extra-depth-label="${label}">${label}<br>Add ${count} herb${count>1?'s':''}</button>`).join('')}</div><div class="gm-extra-progress">Chosen ${chosen} of ${max} extra herbs. When full, the spell moves to Crystal.</div>`;
-    panel.querySelectorAll('[data-extra-depth-file]').forEach(btn=>{
-      btn.onclick=function(e){
-        e.preventDefault(); e.stopPropagation();
-        const s=getSP();
-        const newMax=Number(btn.dataset.extraDepthMax||1);
-        s.intensity=btn.dataset.extraDepthLabel;
-        s.extraMax=newMax;
-        s.extraHerbs=(s.extraHerbs||[]).slice(0,newMax);
-        saveSP(s);
-        rawLoad(btn.dataset.extraDepthFile);
-      };
-    });
-  }
-  function wrapExtraSelection(){
-    if(!isExtra()) return;
-    document.querySelectorAll('[data-choice-index]').forEach(el=>{
-      if(el.dataset.v16ExtraBound==='1') return;
-      el.dataset.v16ExtraBound='1';
-      el.addEventListener('click', function(){
-        setTimeout(()=>{
-          const s=getSP();
-          const max=Number(s.extraMax||1);
-          ensureExtraDepthPanel();
-          if((s.extraHerbs||[]).length>=max){ rawLoad('12_crystal.html'); }
-        },80);
-      }, true);
-    });
-    const cont=document.getElementById('extra-continue');
-    if(cont && cont.dataset.v16Continue!=='1'){
-      cont.dataset.v16Continue='1';
-      cont.onclick=function(e){e.preventDefault();e.stopPropagation();rawLoad('12_crystal.html');};
-    }
-  }
-  function apply(){ /* V55: retired — the v22 depth panel and engine selection are the single owners */ }
+  /* V16 retired (V55): the v22 depth panel and engine selection are the single owners.
+     Unreachable helpers (addStyle/ensureExtraDepthPanel/wrapExtraSelection) and the
+     perpetual no-op 700ms interval removed. Wrappers kept to preserve the chain flags. */
+  function apply(){ /* no-op */ }
   const prevLoad=window.GM_SINGLE_LOAD;
   if(typeof prevLoad==='function' && !prevLoad.__v16Wrapped){
-    window.GM_SINGLE_LOAD=function(file){ prevLoad(file); setTimeout(apply,0); setTimeout(apply,90); setTimeout(apply,260); };
+    window.GM_SINGLE_LOAD=function(file){ prevLoad(file); };
     window.GM_SINGLE_LOAD.__v16Wrapped=true;
   }
   const prevReload=window.GM_SINGLE_RELOAD;
   if(typeof prevReload==='function' && !prevReload.__v16Wrapped){
-    window.GM_SINGLE_RELOAD=function(){ prevReload(); setTimeout(apply,0); setTimeout(apply,100); };
+    window.GM_SINGLE_RELOAD=function(){ prevReload(); };
     window.GM_SINGLE_RELOAD.__v16Wrapped=true;
   }
-  document.addEventListener('DOMContentLoaded',()=>{setTimeout(apply,80);setTimeout(apply,300);});
-  setInterval(apply,700);
 })();
 </script>
 <script id="gm-v17-extra-herbs-direct-fix">
@@ -1204,16 +1129,7 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
     #gm-app .gm-v29-select{background:#e8c040!important;border:3px solid #c9a000!important;color:#2a1a00!important;}
     #gm-app .gm-v29-close{background:#4a3a18!important;border:2px solid #c9a84c!important;color:#e8c97a!important;}
   `; document.head.appendChild(st);}
-  function renderForward(){
-    // V29: remove old forward buttons and create one stable forward button only.
-    qa('#gm-forward-btn,#gm-app .gm-forward-btn,#gm-app .gm-v28-forward').forEach(x=>x.remove());
-    const root=document.querySelector('#gm-app .title-row') || document.querySelector('#gm-app .header-row'); if(!root)return;
-    let btn=$('gm-v29-forward');
-    if(!btn){ btn=document.createElement('button'); btn.id='gm-v29-forward'; btn.className='gm-v29-forward'; btn.type='button'; btn.textContent='Forward →'; root.appendChild(btn); }
-    const target=sessionStorage.getItem('gm_v29_forward_target')||'';
-    btn.hidden=!target || target===cur();
-    btn.onclick=function(e){e.preventDefault();e.stopPropagation();const t=sessionStorage.getItem('gm_v29_forward_target'); if(t){sessionStorage.removeItem('gm_v29_forward_target'); go(t);}};
-  }
+  /* renderForward removed: defined but never called; #gm-v29-forward was never created. V44 owns forward nav. */
   function patchBack(){
     qa('#gm-app .back-btn,#gm-app .nav-btn').forEach(b=>{
       if(b.id==='gm-v29-forward'||b.id==='gm-v28-forward'||b.id==='gm-forward-btn')return;
@@ -3278,18 +3194,8 @@ html,body{height:auto!important;min-height:100%!important;overflow-y:auto!import
     const target=i>0?o[i-1]:'';
     if(target && typeof window.GM_SINGLE_LOAD==='function') window.GM_SINGLE_LOAD(target);
   }
-  function installBack(){ window.GM_SINGLE_BACK=v55Back; }
-  function installHistory(){
-    if(window.__gmV55Hist)return; window.__gmV55Hist=1;
-    try{ history.replaceState({gm:current()||'01_category_numerology.html'},''); }catch(e){}
-    window.addEventListener('popstate',function(){
-      const cur=current();
-      if(cur && cur!=='01_category_numerology.html'){
-        try{ history.pushState({gm:cur},''); }catch(e){}
-        v55Back();
-      }
-    });
-  }
+  /* installBack/installHistory removed: defined but never called. V44 owns GM_SINGLE_BACK.
+     v55Back stays — the live click interceptor below still calls it. */
 
   /* ════ V55 FIX MODULE ════ */
 
