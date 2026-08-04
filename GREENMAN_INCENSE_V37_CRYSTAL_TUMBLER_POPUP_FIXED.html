@@ -455,6 +455,7 @@ function showPage(page){
   page=normalizeTarget(page||'home');
   if(!PAGES[page]) page='home';
   currentPage=page; currentTab=tabFor(page); updateTabs();
+  if(page!=='cupboard') document.body.classList.remove('gm-full-room');
   document.body.className=document.body.className.replace(/\bpage-\S+/g,'').trim()+' page-'+page;
   if(page==='admin' && mode()!=='master'){ openGate(true); return; }
   const old=document.getElementById('pageFrame');
