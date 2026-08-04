@@ -173,7 +173,6 @@ body.gm-full-room.gm-fs-stable #pageFrame{height:100svh!important}
   function stop(e){ try{ e.preventDefault(); }catch(_){} }
   function lockOuter(){
     try{
-      if(document.body.classList.contains('gm-full-room')&&document.body.classList.contains('gm-fs-stable'))return;
       document.documentElement.style.width='100vw';
       document.documentElement.style.maxWidth='100vw';
       document.documentElement.style.overflowX='hidden';
@@ -350,7 +349,6 @@ window.GREENMAN_SHARED_TIMING_DB = [{"name": "ACORN", "old": "FAERY CUPS", "type
 try{ localStorage.setItem('greenman_shared_timing_db_v1', JSON.stringify(window.GREENMAN_SHARED_TIMING_DB)); }catch(e){}
 
 function setAppHeight(){
-  if(document.body.classList.contains('gm-full-room')&&document.body.classList.contains('gm-fs-stable'))return;
   var vv = window.visualViewport;
   var h = (vv && vv.height) || window.innerHeight;
   document.documentElement.style.setProperty('--app-h', h+'px');
@@ -366,7 +364,6 @@ if(window.visualViewport){ window.visualViewport.addEventListener('resize', setA
    the outer app reasserts its device-width viewport and zeroes sideways pan. */
 function gmResetAppViewport(forceMeta){
   try{
-    if(document.body.classList.contains('gm-full-room')&&document.body.classList.contains('gm-fs-stable'))return;
     const fixedViewport='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover';
     let meta=document.querySelector('meta[name="viewport"]');
     if(!meta){
