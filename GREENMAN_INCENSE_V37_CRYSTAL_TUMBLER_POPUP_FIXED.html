@@ -145,6 +145,19 @@ body.gm-full-room #gmShell{grid-template-rows:1fr 0!important;height:100dvh!impo
 body.gm-full-room #frameWrap{height:100dvh!important;min-height:100dvh!important;padding-bottom:0!important}
 body.gm-full-room #pageFrame{height:100dvh!important}
 </style>
+
+<style id="gm-fullscreen-viewport-stabilizer-v1">
+/* Fullscreen + full-room (Rune Hall / Crystal Tumbler): 100dvh tracks Android's
+   live toolbar state, so every toolbar show/hide forces a layout recompute here.
+   Combined with resize handlers elsewhere that reassert scroll position/styles,
+   this can look like Android "waking up" the toolbar in response, which resizes
+   the viewport again, retriggering those same handlers - an oscillating loop.
+   Pinning to 100svh (the stable minimum viewport, not tracking the toolbar)
+   while fullscreen is active removes the moving target the loop needs. */
+body.gm-full-room.gm-fs-stable #gmShell{height:100svh!important}
+body.gm-full-room.gm-fs-stable #frameWrap{height:100svh!important;min-height:100svh!important}
+body.gm-full-room.gm-fs-stable #pageFrame{height:100svh!important}
+</style>
 </head>
 <body>
 <script>
@@ -1653,6 +1666,17 @@ body.gm-full-room #gmDiagButtonV1{bottom:9px}
   },'');
   shellSnapshot('startup');
   window.gmTabletDiagnosticsV1={open:openOverlay,close:closeOverlay,snapshot:shellSnapshot,add:add,getLog:function(){return entries.slice();}};
+})();
+</script>
+
+<script id="gm-fullscreen-viewport-stabilizer-v1-script">
+(function(){
+  function sync(){
+    document.body.classList.toggle('gm-fs-stable', !!(document.fullscreenElement||document.webkitFullscreenElement));
+  }
+  document.addEventListener('fullscreenchange', sync);
+  document.addEventListener('webkitfullscreenchange', sync);
+  sync();
 })();
 </script>
 
