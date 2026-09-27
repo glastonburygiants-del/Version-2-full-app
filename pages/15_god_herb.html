@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>15_god_herb.html</title>
+<style>
+
+
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --app-max:820px;
+  --bg:#2a1a08;
+  --green:#2d4a1e;
+  --dark:#1a1208;
+  --gold:#c9a84c;
+  --gold2:#e8c040;
+  --gold3:#c9a000;
+  --cream:#faf6ec;
+  --cream2:#f0ebe0;
+  --ink:#1a1208;
+  --brown:#8a6a30;
+}
+html,body{height:100%;margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:#e8dfc8;
+  font-family:'Crimson Text',serif;
+  font-size:16px;
+  line-height:1.5;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+}
+
+/* =========================================================
+   ORIGINAL CANDLE-PAGE COLLAPSED TRACKER
+   Kept small/original. Tap anywhere on tracker opens expanded altar.
+   ========================================================= */
+.tracker{
+  position:relative;
+  top:auto;
+  left:auto;
+  transform:none;
+  width:100%;
+  max-width:var(--app-max);
+  background:#2d4a1e;
+  border-bottom:2px solid #c9a84c;
+  padding:6px 8px;
+  z-index:1;
+  cursor:pointer;
+  touch-action:manipulation;
+  flex-shrink:0;
+}
+.tracker-spell{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.18em;
+  color:#c9a84c;
+  text-transform:uppercase;
+  text-align:center;
+  margin-bottom:5px;
+}
+.tracker-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr 58px;
+  grid-template-rows:auto auto auto;
+  gap:3px;
+}
+.ts{
+  border-radius:4px;
+  padding:4px 3px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  min-height:38px;
+  justify-content:center;
+}
+.ts-empty{background:#ede8d8;border:1px solid #a89060;}
+.ts-filled{background:#1a3010;border:2px solid #c9a84c;}
+.ts-active{background:#ede8d8;border:2px solid #c9a84c;}
+.tl{
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:8px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+}
+.ts-empty .tl,.ts-active .tl{color:#5a4a20;}
+.ts-filled .tl{color:#c9a84c;}
+.td{
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:11px;
+  margin-top:2px;
+}
+.ts-empty .td{color:#9a8040;}
+.ts-active .td{color:#c9a84c;}
+.tv{
+  font-family:'Crimson Text',serif;
+  font-style:italic;
+  font-size:11px;
+  font-weight:600;
+  color:#e8dfc8;
+  margin-top:2px;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.deity-col{
+  grid-column:5;
+  grid-row:1/4;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.deity-s{
+  border-radius:4px;
+  padding:4px 3px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.deity-s.ts-empty{background:#ede8d8;border:1px solid #a89060;}
+.deity-s.ts-filled{background:#1a3010;border:2px solid #c9a84c;}
+.deity-s.ts-active{background:#ede8d8;border:2px solid #c9a84c;}
+.deity-s .tl{font-size:8px;}
+.deity-s.ts-empty .tl,.deity-s.ts-active .tl{color:#7a5a10;}
+.deity-s.ts-filled .tl{color:#c9a84c;}
+.deity-s .td{font-size:10px;color:#9a7820;}
+.deity-s.ts-active .td{color:#c9a84c;}
+.spell-row{
+  grid-column:1/5;
+  display:none;
+  gap:3px;
+}
+.spell-row.show{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+}
+.ts-spell{min-height:34px;}
+.ts-spell .tl{font-size:7px;}
+
+/* fixed scroll area */
+.page-scroll{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  width:100%;
+  max-width:var(--app-max);
+  padding:0 12px 22px;
+}
+
+/* title row below tracker */
+.title-row{
+  display:grid;
+  grid-template-columns:74px 1fr 74px;
+  gap:8px;
+  align-items:center;
+  margin:10px 0 8px;
+}
+.nav-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  min-height:42px;
+  border-radius:6px;
+  border:3px solid #c9a000;
+  background:#e8c040;
+  color:#2a1a00;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.nav-btn.hidden{visibility:hidden;}
+.page-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(13px,3.4vw,18px);
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#ffffff;
+  text-align:center;
+  text-shadow:0 1px 2px rgba(0,0,0,.75);
+  line-height:1.25;
+}
+
+/* review page buttons */
+.review-tabs{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  padding-bottom:6px;
+  margin-bottom:8px;
+}
+.review-tab{
+  -webkit-appearance:none;
+  appearance:none;
+  border:1px solid rgba(201,168,76,.35);
+  background:#1a3010;
+  color:#e8c97a;
+  border-radius:6px;
+  padding:7px 9px;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.review-tab.active{
+  background:#e8c040;
+  border:2px solid #c9a000;
+  color:#2a1a00;
+}
+
+/* main guidance */
+.guidance{
+  background:#1a1208;
+  border:1px solid rgba(201,168,76,.38);
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:10px;
+  text-align:center;
+}
+.big-icon{
+  display:block;
+  font-size:48px;
+  line-height:1;
+  margin-bottom:4px;
+}
+.guidance-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:#c9a84c;
+  margin-bottom:5px;
+}
+.guidance-text{
+  font-family:'Crimson Text',serif;
+  font-size:14px;
+  font-style:italic;
+  color:#e8dfc8;
+}
+.guidance-filter{
+  margin-top:6px;
+  color:#a08840;
+  font-size:12px;
+  font-style:italic;
+}
+.progress{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+.progress .el{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:2px solid rgba(201,168,76,.25);
+  background:rgba(255,255,255,.04);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  opacity:.55;
+}
+.progress .el.done{border-color:#c9a84c;background:rgba(201,168,76,.15);opacity:1;}
+.progress .el.active{opacity:1;background:rgba(232,80,48,.18);}
+
+/* deity selector */
+.deity-switches{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+.deity-switches.show{display:grid;}
+.deity-filter{
+  -webkit-appearance:none;
+  appearance:none;
+  min-height:42px;
+  border-radius:6px;
+  background:#faf6ec;
+  border:2px solid rgba(201,168,76,.6);
+  color:#2a1a08;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.deity-filter.active{background:#e8c040;border:3px solid #c9a000;}
+.deity-filter.dual{
+  grid-column:1/-1;
+  min-height:38px;
+}
+
+/* cards */
+.card-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.item-card{
+  border-radius:10px;
+  border:2px solid #c9a84c;
+  background:#faf6ec;
+  overflow:hidden;
+}
+.item-card.recommended{border-width:3px;}
+.item-head{
+  padding:10px 12px;
+  text-align:center;
+  border-bottom:1px solid rgba(201,168,76,.45);
+  cursor:pointer;
+}
+.rank-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:3px;
+}
+.rank{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#7a5a10;
+}
+.badge{
+  display:inline-block;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  background:#2d4a1e;
+  color:#fff;
+  border-radius:4px;
+  padding:3px 7px;
+}
+.item-ye{
+  font-family:'IM Fell English',serif;
+  font-size:23px;
+  color:#1a1208;
+  line-height:1.1;
+}
+.item-name{
+  font-family:'Crimson Text',serif;
+  font-size:15px;
+  font-weight:700;
+  color:#2a1a08;
+}
+.item-latin{
+  font-family:'Crimson Text',serif;
+  font-style:italic;
+  font-size:13px;
+  color:#7a5a10;
+}
+.item-body{
+  padding:10px;
+  display:flex;
+  gap:8px;
+}
+.info-grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+}
+.square-box{
+  background:#f0ebe0;
+  border:1px solid rgba(201,168,76,.38);
+  border-radius:3px;
+  padding:7px;
+}
+.square-box.full{grid-column:1/-1;}
+.box-label{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#5a3a08;
+  margin-bottom:3px;
+}
+.box-text{
+  font-family:'Crimson Text',serif;
+  font-size:12px;
+  color:#1a1208;
+  line-height:1.35;
+  font-weight:600;
+}
+.square-box.greenman .box-text{color:#2a4a15;font-style:italic;}
+.item-btns{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  width:62px;
+  flex-shrink:0;
+}
+.small-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  flex:1;
+  min-height:42px;
+  border-radius:5px;
+  cursor:pointer;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:5px 3px;
+}
+.small-btn.info{background:#4a3a18;color:#e8c97a;border:2px solid #c9a84c;}
+.small-btn.add{background:#e8c040;border:3px solid #c9a000;color:#2a1a00;}
+.assoc-row{
+  background:#f0ebe0;
+  border-top:1px solid rgba(201,168,76,.25);
+  padding:7px 10px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
+}
+.assoc{
+  font-family:'Crimson Text',serif;
+  font-size:11px;
+  color:#1a1208;
+  font-weight:700;
+  line-height:1.2;
+  text-align:center;
+  border:1px solid rgba(201,168,76,.28);
+  background:#faf6ec;
+  border-radius:3px;
+  padding:5px 2px;
+}
+.assoc span{
+  display:block;
+  font-family:'Cinzel',serif;
+  font-size:7px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#7a5a10;
+  margin-bottom:1px;
+}
+.show-more{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  min-height:48px;
+  border-radius:8px;
+  background:#e8c040;
+  border:3px solid #c9a000;
+  color:#2a1a00;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+  margin-top:4px;
+}
+
+/* =========================================================
+   EXPANDED TRACKER / ALTAR POPUP
+   Same candle-page layout, made bigger/lighter.
+   ========================================================= */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(10,6,2,0.82);
+  z-index:1200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+}
+.overlay.open{display:flex;}
+.altar-sheet{
+  background:#faf6ec;
+  border:3px solid #c9a84c;
+  width:100%;
+  max-width:600px;
+  padding:18px 16px 22px;
+  border-radius:16px 16px 0 0;
+  max-height:94vh;
+  overflow-y:auto;
+  color:#1a1208;
+  box-shadow:0 -8px 28px rgba(0,0,0,.45);
+}
+.altar-title{
+  font-family:'IM Fell English',serif;
+  font-size:26px;
+  font-weight:700;
+  color:#1a1208;
+  text-align:center;
+  margin-bottom:3px;
+}
+.altar-sub{
+  font-family:'Crimson Text',serif;
+  font-style:italic;
+  font-weight:700;
+  font-size:15px;
+  color:#5a3a08;
+  text-align:center;
+  margin-bottom:14px;
+}
+.altar-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:14px;
+}
+.altar-row.bottom{margin-top:14px;}
+.a-slot{
+  background:#f0ebe0;
+  border:2px solid rgba(201,168,76,.55);
+  border-radius:8px;
+  padding:9px 5px;
+  text-align:center;
+  min-height:66px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  cursor:pointer;
+  color:#1a1208;
+}
+.altar-row .a-slot{flex:1;}
+.a-slot.filled{
+  background:#fff4d8;
+  border:3px solid #c9a84c;
+  box-shadow:inset 0 0 0 1px rgba(45,74,30,.18);
+}
+.a-slot.active{
+  background:#fff4d8;
+  border:3px solid #e8c040;
+  box-shadow:0 0 0 2px rgba(201,168,76,.22);
+}
+.a-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+  color:#5a3a08;
+}
+.a-val{
+  font-family:'Crimson Text',serif;
+  font-style:italic;
+  font-weight:700;
+  font-size:14px;
+  color:#1a1208;
+  line-height:1.15;
+}
+.a-dash{
+  font-family:'Cinzel',serif;
+  font-size:16px;
+  font-weight:700;
+  color:#7a5a10;
+}
+.element-circle{
+  position:relative;
+  width:330px;
+  height:330px;
+  margin:0 auto 8px;
+}
+.element-circle svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+.element-circle .north{
+  position:absolute;
+  top:2px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92px;
+}
+.element-circle .east{
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:92px;
+}
+.element-circle .south{
+  position:absolute;
+  bottom:2px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92px;
+}
+.element-circle .west{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:92px;
+}
+.element-circle .centre{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:124px;
+  min-height:92px;
+  padding:12px 8px;
+  background:#fff4d8;
+  border:3px solid rgba(201,168,76,.6);
+}
+.close-btn,.popup-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  min-height:46px;
+  margin-top:12px;
+  border-radius:8px;
+  background:#e8c040;
+  border:3px solid #c9a000;
+  color:#2a1a00;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+/* Light info sheet */
+.info-popup{
+  position:fixed;
+  inset:0;
+  background:rgba(10,6,2,.86);
+  z-index:1400;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.info-popup.open{display:flex;}
+.info-sheet{
+  width:100%;
+  max-width:430px;
+  max-height:90vh;
+  overflow-y:auto;
+  background:#faf6ec;
+  border:2px solid #c9a84c;
+  border-radius:12px;
+  padding:14px;
+  color:#1a1208;
+  box-shadow:0 8px 30px rgba(0,0,0,.55);
+}
+.info-name-block{
+  text-align:center;
+  padding:8px 8px 12px;
+  border-bottom:2px solid rgba(201,168,76,.35);
+  margin-bottom:10px;
+}
+.info-type{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#7a5a10;
+  margin-bottom:4px;
+}
+.info-old{
+  font-family:'IM Fell English',serif;
+  font-size:26px;
+  color:#1a1208;
+  line-height:1.1;
+}
+.info-name{
+  font-family:'Crimson Text',serif;
+  font-weight:700;
+  font-size:16px;
+  color:#1a1208;
+}
+.info-latin{
+  font-family:'Crimson Text',serif;
+  font-style:italic;
+  font-size:13px;
+  color:#7a5a10;
+}
+.info-square-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+.info-square{
+  background:#f0ebe0;
+  border:1px solid rgba(201,168,76,.45);
+  border-radius:3px;
+  padding:8px;
+}
+.info-square.full{grid-column:1/-1;}
+.info-square-label{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#5a3a08;
+  margin-bottom:4px;
+}
+.info-square-text{
+  font-family:'Crimson Text',serif;
+  font-size:14px;
+  color:#1a1208;
+  font-weight:600;
+  line-height:1.4;
+}
+.info-green{color:#2a4a15;font-style:italic;}
+.association-words{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+}
+.aword{
+  background:#faf6ec;
+  border:1px solid rgba(201,168,76,.38);
+  border-radius:3px;
+  padding:5px 6px;
+  font-family:'Crimson Text',serif;
+  font-size:13px;
+  color:#1a1208;
+  font-weight:700;
+}
+.aword b{
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:#7a5a10;
+  display:block;
+}
+.popup-btn.dark{background:#4a3a18;border:2px solid #c9a84c;color:#e8c97a;}
+
+/* bottom tabbar */
+.tabbar{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:var(--app-max);
+  background:#2d4a1e;
+  border-top:2px solid #c9a84c;
+  display:flex;
+  padding:6px 0 8px;
+  z-index:300;
+}
+.tab{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+}
+.tab-icon{font-size:16px;line-height:1;color:#8a9a7a;}
+.tab-label{
+  font-family:'Cinzel',serif;
+  font-size:7px;
+  letter-spacing:.08em;
+  color:#8a9a7a;
+  text-transform:uppercase;
+}
+.tab.active .tab-icon,.tab.active .tab-label{color:#c9a84c;}
+
+.note-panel{
+  margin-top:14px;
+  background:#faf6ec;
+  border:1px solid rgba(201,168,76,.45);
+  border-radius:8px;
+  overflow:hidden;
+}
+.note-h{
+  background:#8a6a30;
+  color:#fff;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:9px 11px;
+}
+.note-b{
+  padding:10px 12px;
+  color:#2a1a08;
+  font-size:13px;
+}
+.note-b ul{list-style:none;}
+.note-b li{padding:4px 0 4px 18px;position:relative;}
+.note-b li:before{content:'✦';position:absolute;left:0;top:5px;color:#c9a84c;font-size:10px;}
+
+@media (min-width:700px){
+  .page-scroll{padding-left:24px;padding-right:24px;}
+  .overlay{align-items:center;padding:20px;}
+  .altar-sheet{border-radius:16px;}
+  .element-circle{width:370px;height:370px;}
+  .element-circle .north,.element-circle .east,.element-circle .south,.element-circle .west{width:104px;}
+  .element-circle .centre{width:140px;min-height:100px;}
+}
+
+
+/* NEW SHELL VERSION 1 runtime display fixes only. Locked source files are untouched. */
+.bottom-tabbar,.tabbar.app-fixed,nav.bottom-tabbar,nav.tabbar{display:none!important;}
+.logic-panel,.review-logic,.developer-note,.fallback-note{display:none!important;}
+body{padding-bottom:0!important;}
+/* compact spell tracker on phone screens */
+@media(max-width:520px){
+  .tracker{padding:3px 4px!important;}
+  .tracker-spell{font-size:8px!important;letter-spacing:.08em!important;margin-bottom:2px!important;}
+  .tracker-grid{gap:2px!important;grid-template-columns:1fr 1fr 1fr 1fr 44px!important;}
+  .ts,.deity-s{min-height:28px!important;padding:2px 1px!important;border-width:1px!important;}
+  .tl,.deity-s .tl{font-size:6.5px!important;letter-spacing:0!important;}
+  .td,.deity-s .td{font-size:8px!important;margin-top:0!important;}
+  .tv{font-size:8px!important;margin-top:0!important;}
+  .ts-spell{min-height:25px!important;}
+  .page-scroll{top:auto!important;bottom:auto!important;}
+}
+
+body.gm-print-v61{padding-bottom:0!important;}
+body.gm-print-v61 .fallback-note{display:none!important;}
+body.gm-print-v61 .instruction-dev-box{display:none!important;}
+
+/* OPEN-BOWL OVERRIDES: no app tabs, no real engine, keep page skin */
+.tabbar,.bottom-tabbar,nav.tabbar,nav.bottom-tabbar,.note-panel,.correction-note,.fallback-note,.developer-note,.logic-panel,.review-logic{display:none!important;}
+body{padding-bottom:0!important;overflow:auto!important;}
+button,[data-action],[data-nav]{cursor:pointer;}
+[data-engine-slot], [data-placeholder-id]{outline:1px dashed rgba(232,192,64,.28);outline-offset:-2px;}
+.placeholder-text{font-style:italic;color:rgba(42,26,8,.72)!important;}
+.open-id{display:block;font-family:Cinzel,serif;font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:#7a5a10;margin-top:3px;word-break:break-word;}
+.viewer-pad{padding-bottom:32px;}
+
+</style>
+</head>
+<body>
+<div class="tracker" data-action="open-tracker" data-component="removable-global-tracker" id="tracker-shell">
+<div class="tracker-spell" id="tracker-spell-title">✦ <span data-placeholder-id="tracker-spell-titleText" id="tracker-spell-titleText"></span> ✦</div>
+<div class="tracker-grid" id="tracker-grid">
+<div class="ts ts-empty" data-tracker-slot="earth" id="tracker-earth"><div class="tl">🌍 Earth</div><div class="td" data-placeholder-id="tracker-earth-value" id="tracker-earth-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="air" id="tracker-air"><div class="tl">💨 Air</div><div class="td" data-placeholder-id="tracker-air-value" id="tracker-air-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="fire" id="tracker-fire"><div class="tl">🔥 Fire</div><div class="td" data-placeholder-id="tracker-fire-value" id="tracker-fire-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="water" id="tracker-water"><div class="tl">💧 Water</div><div class="td" data-placeholder-id="tracker-water-value" id="tracker-water-value"></div></div>
+<div class="deity-col"><div class="deity-s" id="tracker-goddess"><div class="tl">☽ Goddess</div><div class="td"><span data-placeholder-id="empty" id="empty"></span></div></div><div class="deity-s" id="tracker-god"><div class="tl">☀ God</div><div class="td"><span data-placeholder-id="empty2" id="empty2"></span></div></div></div>
+<div class="ts ts-empty" data-tracker-slot="candle" id="tracker-candle"><div class="tl">🕯 Candle</div><div class="td" data-placeholder-id="tracker-candle-value" id="tracker-candle-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="crystal" id="tracker-crystal"><div class="tl">◈ Crystal</div><div class="td" data-placeholder-id="tracker-crystal-value" id="tracker-crystal-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="rune" id="tracker-rune"><div class="tl">᚛ Rune</div><div class="td" data-placeholder-id="tracker-rune-value" id="tracker-rune-value"></div></div>
+<div class="ts ts-empty" data-tracker-slot="oil" id="tracker-oil"><div class="tl">🫙 Oil</div><div class="td" data-placeholder-id="tracker-oil-value" id="tracker-oil-value"></div></div>
+<div class="spell-row" id="tracker-extra-herb-row">
+<div class="ts ts-spell ts-empty" id="tracker-extra-herb-1"><div class="tl">🌿 Herb 1</div><div class="td"><span data-placeholder-id="empty3" id="empty3"></span></div></div>
+</div></div></div><main class="page-scroll viewer-pad" data-step="god" data-if-goddess-both-show="Both" id="god-page">
+<div class="title-row"><button class="nav-btn" data-nav="back" id="god-back-btn">← Back</button><div class="page-title">✦ Choose God Deity ✦</div><button class="nav-btn hidden" data-nav="forward" id="god-forward-btn">Forward →</button></div>
+<section class="guidance" id="god-guidance"><span class="big-icon">☀</span><div class="guidance-label" id="god-guidance-title">✦ <span data-placeholder-id="god-guidance-titleText" id="god-guidance-titleText"></span> ✦</div><div class="guidance-text" data-placeholder-id="god-guidance-text" id="god-guidance-text"></div><div class="guidance-filter" data-placeholder-id="god-filter-label" id="god-filter-label"></div><div class="progress" data-placeholder-id="god-progress" id="god-progress"></div></section>
+<section class="card-list" data-engine-slot="god-items" data-filter-kind="herb" data-deity-stage="god" data-energy-values="Male,Both" id="god-cards"><article class="item-card recommended" data-action="select-god" data-select-target="tracker-god" id="god-card-1">
+<header class="item-head" data-action="open-info-god-1" id="god-card-head-1"><div class="rank-row"><span class="rank">Rank 1</span><span class="badge"><span data-placeholder-id="badge" id="badge"></span></span></div><div class="item-ye" data-placeholder-id="god-ye-1" id="god-ye-1"></div><div class="item-name" data-placeholder-id="god-name-1" id="god-name-1"></div><div class="item-latin" data-placeholder-id="god-latin-1" id="god-latin-1"></div></header>
+<div class="item-body"><div class="info-grid" id="god-info-grid-1"><div class="square-box"><div class="box-label">Magical Use</div><div class="box-text" data-placeholder-id="god-magical-use-1" id="god-magical-use-1"></div></div><div class="square-box"><div class="box-label">Powers</div><div class="box-text" data-placeholder-id="god-powers-1" id="god-powers-1"></div></div><div class="square-box greenman full"><div class="box-label">Greenman Energy</div><div class="box-text" data-placeholder-id="god-greenman-energy-1" id="god-greenman-energy-1"></div></div></div><div class="item-btns"><button class="small-btn info" data-action="open-info" id="god-info-btn-1">Info</button><button class="small-btn add" data-action="select-item" id="god-add-btn-1">Add</button></div></div>
+<div class="assoc-row" id="god-assoc-row-1"><div class="assoc"><span>Element</span><span data-placeholder-id="id" id="id"></span></div><div class="assoc"><span>Planet</span><span data-placeholder-id="id2" id="id2"></span></div><div class="assoc"><span>Candle</span><span data-placeholder-id="id3" id="id3"></span></div><div class="assoc"><span>Rune</span><span data-placeholder-id="id4" id="id4"></span></div><div class="assoc"><span>Oil</span><span data-placeholder-id="id5" id="id5"></span></div></div></article><article class="item-card recommended" data-action="select-god" data-select-target="tracker-god" id="god-card-2">
+<header class="item-head" data-action="open-info-god-2" id="god-card-head-2"><div class="rank-row"><span class="rank">Rank 2</span><span class="badge"><span data-placeholder-id="badge2" id="badge2"></span></span></div><div class="item-ye" data-placeholder-id="god-ye-2" id="god-ye-2"></div><div class="item-name" data-placeholder-id="god-name-2" id="god-name-2"></div><div class="item-latin" data-placeholder-id="god-latin-2" id="god-latin-2"></div></header>
+<div class="item-body"><div class="info-grid" id="god-info-grid-2"><div class="square-box"><div class="box-label">Magical Use</div><div class="box-text" data-placeholder-id="god-magical-use-2" id="god-magical-use-2"></div></div><div class="square-box"><div class="box-label">Powers</div><div class="box-text" data-placeholder-id="god-powers-2" id="god-powers-2"></div></div><div class="square-box greenman full"><div class="box-label">Greenman Energy</div><div class="box-text" data-placeholder-id="god-greenman-energy-2" id="god-greenman-energy-2"></div></div></div><div class="item-btns"><button class="small-btn info" data-action="open-info" id="god-info-btn-2">Info</button><button class="small-btn add" data-action="select-item" id="god-add-btn-2">Add</button></div></div>
+<div class="assoc-row" id="god-assoc-row-2"><div class="assoc"><span>Element</span><span data-placeholder-id="id6" id="id6"></span></div><div class="assoc"><span>Planet</span><span data-placeholder-id="id7" id="id7"></span></div><div class="assoc"><span>Candle</span><span data-placeholder-id="id8" id="id8"></span></div><div class="assoc"><span>Rune</span><span data-placeholder-id="id9" id="id9"></span></div><div class="assoc"><span>Oil</span><span data-placeholder-id="id10" id="id10"></span></div></div></article><article class="item-card recommended" data-action="select-god" data-select-target="tracker-god" id="god-card-3">
+<header class="item-head" data-action="open-info-god-3" id="god-card-head-3"><div class="rank-row"><span class="rank">Rank 3</span><span class="badge"><span data-placeholder-id="badge3" id="badge3"></span></span></div><div class="item-ye" data-placeholder-id="god-ye-3" id="god-ye-3"></div><div class="item-name" data-placeholder-id="god-name-3" id="god-name-3"></div><div class="item-latin" data-placeholder-id="god-latin-3" id="god-latin-3"></div></header>
+<div class="item-body"><div class="info-grid" id="god-info-grid-3"><div class="square-box"><div class="box-label">Magical Use</div><div class="box-text" data-placeholder-id="god-magical-use-3" id="god-magical-use-3"></div></div><div class="square-box"><div class="box-label">Powers</div><div class="box-text" data-placeholder-id="god-powers-3" id="god-powers-3"></div></div><div class="square-box greenman full"><div class="box-label">Greenman Energy</div><div class="box-text" data-placeholder-id="god-greenman-energy-3" id="god-greenman-energy-3"></div></div></div><div class="item-btns"><button class="small-btn info" data-action="open-info" id="god-info-btn-3">Info</button><button class="small-btn add" data-action="select-item" id="god-add-btn-3">Add</button></div></div>
+<div class="assoc-row" id="god-assoc-row-3"><div class="assoc"><span>Element</span><span data-placeholder-id="id11" id="id11"></span></div><div class="assoc"><span>Planet</span><span data-placeholder-id="id12" id="id12"></span></div><div class="assoc"><span>Candle</span><span data-placeholder-id="id13" id="id13"></span></div><div class="assoc"><span>Rune</span><span data-placeholder-id="id14" id="id14"></span></div><div class="assoc"><span>Oil</span><span data-placeholder-id="id15" id="id15"></span></div></div></article></section><button class="show-more" data-action="show-more" id="god-show-more-btn">Show More · 7 More</button></main><div class="overlay" data-component="removable-tracker-popup" id="altar-overlay">
+<div class="altar-sheet">
+<div class="altar-title">✦ Greenman Altar View ✦</div><div class="altar-sub"><em data-placeholder-id="altar-spell-name" id="altar-spell-name"></em></div>
+<div style="display:flex;gap:8px;margin-bottom:10px;"><div class="a-slot" id="altar-god"><div class="a-label">☀ God</div><div class="a-dash"><span data-placeholder-id="empty4" id="empty4"></span></div></div><div class="a-slot" id="altar-candle"><div class="a-label">🕯 Candle</div><div class="a-dash"><span data-placeholder-id="empty5" id="empty5"></span></div></div><div class="a-slot" id="altar-goddess"><div class="a-label">☽ Goddess</div><div class="a-dash"><span data-placeholder-id="empty6" id="empty6"></span></div></div></div>
+<div class="element-circle" id="altar-element-circle"><div class="a-slot" id="altar-earth"><div class="a-label">🌍 Earth</div><div class="a-dash"><span data-placeholder-id="empty7" id="empty7"></span></div></div><div class="a-slot" id="altar-air"><div class="a-label">💨 Air</div><div class="a-dash"><span data-placeholder-id="empty8" id="empty8"></span></div></div><div class="a-slot" id="altar-fire"><div class="a-label">🔥 Fire</div><div class="a-dash"><span data-placeholder-id="empty9" id="empty9"></span></div></div><div class="a-slot" id="altar-water"><div class="a-label">💧 Water</div><div class="a-dash"><span data-placeholder-id="empty10" id="empty10"></span></div></div><div class="a-slot" data-placeholder-id="altar-extra-herb-1" id="altar-extra-herb-1"><div class="a-label">🌿 Herb 1</div><div class="a-dash"><span data-placeholder-id="empty11" id="empty11"></span></div></div></div>
+<div style="display:flex;gap:8px;margin-top:10px;"><div class="a-slot" id="altar-crystal"><div class="a-label">◈ Crystal</div><div class="a-dash"><span data-placeholder-id="empty12" id="empty12"></span></div></div><div class="a-slot" id="altar-rune"><div class="a-label">᚛ Rune</div><div class="a-dash"><span data-placeholder-id="empty13" id="empty13"></span></div></div><div class="a-slot" id="altar-oil"><div class="a-label">🫙 Oil</div><div class="a-dash"><span data-placeholder-id="empty14" id="empty14"></span></div></div></div>
+<button class="close-btn" data-action="close-tracker" id="tracker-close-btn">✕ Close</button></div></div><div class="info-popup" id="god-info-popup"><div class="info-sheet" data-engine-slot="god-info-sheet" data-placeholder-id="god-info-sheet" id="god-info-sheet"></div></div>
+
+
+<script>
+// ── SHARED HELPERS (from main engine script[2]) ──
+const getName = (r)=> first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Spell, r.Color, r.Colour);
+const getOld = (r)=> first(r['Ye Olde Name'], r['Olde Name'], r.YeOlde, '');
+  const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+  const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+const getElement = (r)=> first(r.Element, '');
+  const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+  const energyField = (modeName) => {
+const getGM = (r, sp)=> first(r[energyField(sp?.gmMode || sp?.['Greenman Energy Mode'])], r['Greenman Energy — Main'], r['Greenman Energy Main'], r['Greenman Energy'], '');
+const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+  const getElement = (r)=> first(r.Element, '');
+const shorten = (s,n=180)=>{s=t(s); return s.length>n?s.slice(0,n-1)+'…':s;};
+  const slug = (s)=>lc(s).replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+function load(){ try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return{};} }
+function save(sp){ localStorage.setItem(STORE, JSON.stringify(sp||{})); }
+function reset(){ localStorage.removeItem(STORE); }
+function go(key){ const target = pages[key] || key; if(window.GM_SINGLE_LOAD){ window.GM_SINGLE_LOAD(target); } else { location.href = target; } }
+function goBack(){ if(window.GM_SINGLE_BACK){ window.GM_SINGLE_BACK(); return; } history.length>1 ? history.back() : go('start'); }
+
+// ── RENDER FUNCTION FOR THIS PAGE ──
+// Page: 15_god_herb.html
+function renderSelectPage(kind, filterFn, dataSet, matchField, next, maxShow=3){
+    const sp=load(); updateTracker();
+    const host = document.querySelector('[data-engine-slot$="items"], .card-list, #earth-cards, #air-cards, #fire-cards, #water-cards, #crystal-cards, #rune-cards, #oil-cards, #goddess-cards, #god-cards');
+    const pool = ranked(dataSet().filter(filterFn), sp, matchField);
+    const key='gm_show_'+kind; let show=Number(sessionStorage.getItem(key)||maxShow); if(show<maxShow) show=maxShow;
+    const visible=pool.slice(0,show);
+    if(host){ host.innerHTML=visible.map((r,i)=>cardItem(r,kind,i)).join(''); }
+    let btn=document.querySelector('.show-more');
+    if(btn){ btn.style.display = pool.length>show ? 'block':'none'; btn.onclick=()=>{ sessionStorage.setItem(key, String(show+7)); (window.GM_SINGLE_RELOAD ? window.GM_SINGLE_RELOAD() : location.reload()); }; }
+    bindChoices(visible, kind, next);
+  }
+</script>
+</body>
+</html>

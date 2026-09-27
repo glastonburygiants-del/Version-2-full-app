@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>08_spell_intensity.html</title>
+<style>
+
+
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --app-max:820px;
+  --bg:#2a1a08;
+  --green:#2d4a1e;
+  --dark:#1a1208;
+  --gold:#c9a84c;
+  --gold2:#e8c040;
+  --gold3:#c9a000;
+  --cream:#faf6ec;
+  --brown:#8a6a30;
+  --text:#e8dfc8;
+  --dim:#a08840;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Crimson Text',serif;
+  font-size:16px;
+  line-height:1.5;
+  padding-bottom:76px;
+}
+
+/* fixed app-width frame so tablet does not stretch */
+.app-fixed{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:var(--app-max);
+  z-index:200;
+}
+.app-page{
+  width:100%;
+  max-width:var(--app-max);
+  margin:0 auto;
+  padding:126px 12px 86px;
+}
+
+/* HEADER */
+.page-header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:var(--green);
+  border-bottom:2px solid var(--gold);
+  padding:10px 10px 12px;
+}
+.header-row{
+  display:grid;
+  grid-template-columns:74px 1fr 74px;
+  align-items:center;
+  gap:8px;
+}
+.back-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  min-height:42px;
+  border-radius:6px;
+  border:2px solid var(--gold);
+  background:#4a3a18;
+  color:#e8c97a;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1px;
+}
+.back-btn span:first-child{font-size:14px;line-height:1;}
+.cat-head{
+  text-align:center;
+  min-width:0;
+}
+.cat-icon{
+  font-size:22px;
+  line-height:1;
+  display:block;
+  margin-bottom:3px;
+  color:#e8c040;
+}
+.cat-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(12px,3.5vw,16px);
+  font-weight:700;
+  letter-spacing:.08em;
+  line-height:1.15;
+  color:var(--gold);
+  text-transform:uppercase;
+}
+.cat-count{
+  font-family:'Crimson Text',serif;
+  font-size:13px;
+  font-style:italic;
+  color:#e8dfc8;
+  margin-top:2px;
+}
+.header-spacer{width:74px;height:42px;}
+
+/* compact dark info box */
+.info-box{
+  background:var(--dark);
+  border:1px solid rgba(201,168,76,.35);
+  border-radius:9px;
+  padding:10px 12px;
+  margin-bottom:10px;
+  text-align:center;
+}
+.info-title{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:4px;
+}
+.info-text{
+  font-family:'Crimson Text',serif;
+  font-size:14px;
+  font-style:italic;
+  color:#e8dfc8;
+}
+
+/* SPELL LIST */
+.spell-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.spell-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  border:1px solid rgba(201,168,76,.4);
+  background:#1a1208;
+  border-radius:8px;
+  padding:12px 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#fff;
+  cursor:pointer;
+  text-align:left;
+}
+.spell-btn:active{
+  transform:translateY(1px);
+  border-color:var(--gold2);
+}
+.spell-left-icon{
+  width:28px;
+  min-width:28px;
+  height:28px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.45);
+  background:#2d4a1e;
+  color:#e8c040;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+}
+.spell-name{
+  flex:1;
+  min-width:0;
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  line-height:1.25;
+  color:#ffffff;
+  text-transform:uppercase;
+}
+.moon-side{
+  width:72px;
+  min-width:72px;
+  text-align:right;
+}
+.moon-icon{
+  font-size:18px;
+  line-height:1;
+  display:block;
+  color:#e8c040;
+}
+.moon-name{
+  font-family:'Crimson Text',serif;
+  font-size:12px;
+  color:#c9a84c;
+  font-style:italic;
+  line-height:1.15;
+  display:block;
+  margin-top:2px;
+}
+
+/* selected confirmation */
+.selected-note{
+  display:none;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:74px;
+  max-width:var(--app-max);
+  width:calc(100% - 20px);
+  background:#e8c040;
+  color:#2a1a00;
+  border:3px solid #c9a000;
+  border-radius:8px;
+  padding:11px 12px;
+  z-index:450;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+/* review logic panel */
+.logic-panel{
+  margin-top:14px;
+  background:#faf6ec;
+  border:1px solid rgba(201,168,76,.45);
+  border-radius:8px;
+  overflow:hidden;
+}
+.logic-h{
+  background:#8a6a30;
+  color:#fff;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:9px 11px;
+}
+.logic-b{
+  padding:10px 12px;
+  color:#2a1a08;
+  font-size:13px;
+}
+.logic-row{
+  display:flex;
+  gap:8px;
+  border-bottom:1px solid rgba(138,96,48,.18);
+  padding:5px 0;
+}
+.logic-row:last-child{border-bottom:0;}
+.logic-label{
+  width:96px;
+  min-width:96px;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#5a3a08;
+}
+.logic-val{
+  flex:1;
+}
+
+/* TABBAR */
+.tabbar{
+  bottom:0;
+  background:var(--green);
+  border-top:2px solid var(--gold);
+  display:flex;
+  padding:6px 0 8px;
+}
+.tab{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  text-align:center;
+}
+.tab-icon{font-size:16px;line-height:1;color:#8a9a7a;}
+.tab-label{
+  font-family:'Cinzel',serif;
+  font-size:7px;
+  letter-spacing:.08em;
+  color:#8a9a7a;
+  text-transform:uppercase;
+}
+.tab.active .tab-icon,
+.tab.active .tab-label{color:var(--gold);}
+
+@media (min-width:700px){
+  .app-page{padding-left:24px;padding-right:24px;}
+  .spell-btn{padding:14px 14px;}
+  .spell-name{font-size:12px;}
+  .moon-side{width:86px;min-width:86px;}
+}
+
+
+/* NEW SHELL VERSION 1 runtime display fixes only. Locked source files are untouched. */
+.bottom-tabbar,.tabbar.app-fixed,nav.bottom-tabbar,nav.tabbar{display:none!important;}
+.logic-panel,.review-logic,.developer-note,.fallback-note{display:none!important;}
+body{padding-bottom:0!important;}
+/* Fix: inside iframe the fixed+translate header breaks layout - force sticky */
+.page-header.app-fixed{position:sticky!important;top:0!important;left:0!important;transform:none!important;width:100%!important;max-width:100%!important;}
+.app-page{padding-top:0!important;}
+/* compact spell tracker on phone screens */
+@media(max-width:520px){
+  .tracker{padding:3px 4px!important;}
+  .tracker-spell{font-size:8px!important;letter-spacing:.08em!important;margin-bottom:2px!important;}
+  .tracker-grid{gap:2px!important;grid-template-columns:1fr 1fr 1fr 1fr 44px!important;}
+  .ts,.deity-s{min-height:28px!important;padding:2px 1px!important;border-width:1px!important;}
+  .tl,.deity-s .tl{font-size:6.5px!important;letter-spacing:0!important;}
+  .td,.deity-s .td{font-size:8px!important;margin-top:0!important;}
+  .tv{font-size:8px!important;margin-top:0!important;}
+  .ts-spell{min-height:25px!important;}
+  .page-scroll{top:auto!important;bottom:auto!important;}
+}
+
+body.gm-print-v61{padding-bottom:0!important;}
+body.gm-print-v61 .fallback-note{display:none!important;}
+body.gm-print-v61 .instruction-dev-box{display:none!important;}
+
+/* OPEN-BOWL OVERRIDES: no app tabs, no real engine, keep page skin */
+.tabbar,.bottom-tabbar,nav.tabbar,nav.bottom-tabbar,.note-panel,.correction-note,.fallback-note,.developer-note,.logic-panel,.review-logic{display:none!important;}
+body{padding-bottom:0!important;overflow:auto!important;}
+button,[data-action],[data-nav]{cursor:pointer;}
+[data-engine-slot], [data-placeholder-id]{outline:1px dashed rgba(232,192,64,.28);outline-offset:-2px;}
+.placeholder-text{font-style:italic;color:rgba(42,26,8,.72)!important;}
+.open-id{display:block;font-family:Cinzel,serif;font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:#7a5a10;margin-top:3px;word-break:break-word;}
+.viewer-pad{padding-bottom:32px;}
+
+</style>
+</head>
+<body>
+<header class="page-header"><div class="header-row"><button class="back-btn" data-nav="back" id="spell-intensity-back"><span>←</span><span>Back</span></button><div class="cat-head"><span class="cat-icon">🌿</span><div class="cat-title">Choose Spell Depth</div><div class="cat-count" data-placeholder-id="spell-depth-current" id="spell-depth-current"></div></div><div class="header-spacer"></div></div></header><main class="app-page viewer-pad" data-step="spell-intensity"><section class="info-box"><div class="info-title">✦ Choose Spell Intensity ✦</div><div class="info-text"><span data-placeholder-id="intensityHelp" id="intensityHelp"></span></div></section><section class="spell-list" data-engine-slot="spell-intensity" id="intensity-options"><button class="spell-btn" data-action="select-intensity-handful" data-nav="extra-herbs-handful" data-extra-herb-count="1" id="intensity-handful"><span class="spell-left-icon">1</span><span class="spell-name">A Handful</span><span class="moon-side">7 herbs</span></button><button class="spell-btn" data-action="select-intensity-weaving" data-nav="extra-herbs-weaving" data-extra-herb-count="3" id="intensity-weaving"><span class="spell-left-icon">3</span><span class="spell-name">A Weaving</span><span class="moon-side">9 herbs</span></button><button class="spell-btn" data-action="select-intensity-grove" data-nav="extra-herbs-full-grove" data-extra-herb-count="7" id="intensity-grove"><span class="spell-left-icon">7</span><span class="spell-name">The Full Grove</span><span class="moon-side">13 herbs</span></button></section></main>
+
+
+<script>
+// ── SHARED HELPERS (from main engine script[2]) ──
+const getName = (r)=> first(r.Name, r['Name/Entity'], r['Spell/Charm Type'], r.Spell, r.Color, r.Colour);
+const getOld = (r)=> first(r['Ye Olde Name'], r['Olde Name'], r.YeOlde, '');
+  const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+const getLatin = (r)=> first(r['Latin Name'], r.Latin, r['Latin name'], '');
+  const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+const getElement = (r)=> first(r.Element, '');
+  const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+const getPlanet = (r)=> first(r.Planet, '');
+  const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getPowers = (r)=> first(r.Powers, '');
+  const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+const getUses = (r)=> first(r['Magical Uses'], r['Magical Use'], '');
+  const energyField = (modeName) => {
+const getGM = (r, sp)=> first(r[energyField(sp?.gmMode || sp?.['Greenman Energy Mode'])], r['Greenman Energy — Main'], r['Greenman Energy Main'], r['Greenman Energy'], '');
+const getEnergy = (r)=> first(r.Energy, r.Gender, r.Polarity, '');
+  const getElement = (r)=> first(r.Element, '');
+const shorten = (s,n=180)=>{s=t(s); return s.length>n?s.slice(0,n-1)+'…':s;};
+  const slug = (s)=>lc(s).replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+function load(){ try{return JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch(e){return{};} }
+function save(sp){ localStorage.setItem(STORE, JSON.stringify(sp||{})); }
+function reset(){ localStorage.removeItem(STORE); }
+function go(key){ const target = pages[key] || key; if(window.GM_SINGLE_LOAD){ window.GM_SINGLE_LOAD(target); } else { location.href = target; } }
+function goBack(){ if(window.GM_SINGLE_BACK){ window.GM_SINGLE_BACK(); return; } history.length>1 ? history.back() : go('start'); }
+
+// ── RENDER FUNCTION FOR THIS PAGE ──
+// Page: 08_spell_intensity.html
+function renderIntensity(){
+    updateTracker();
+    const map=[['handful',1,'Handful'],['weaving',3,'Weaving'],['grove',5,'Full Grove']];
+    qa('.tier-btn, [data-intensity]').forEach((b,i)=>{ const m=map[i]||map[0]; b.onclick=()=>{ const sp=load(); sp.intensity=m[2]; sp.extraMax=m[1]; sp.extraHerbs=[]; save(sp); go(m[0]); }; });
+    // Fallback if buttons are not marked clearly
+    if(!qa('.tier-btn, [data-intensity]').length){
+      const main=document.querySelector('main')||document.body;
+      main.insertAdjacentHTML('beforeend', `<div class="tier-grid">${map.map(m=>`<button class="tier-btn"><span class="tier-num">${m[1]}</span><span><span class="tier-name">${m[2]}</span><span class="tier-count">Choose ${m[1]} extra herb${m[1]>1?'s':''}</span></span></button>`).join('')}</div>`);
+      renderIntensity();
+    }
+  }
+</script>
+</body>
+</html>
